@@ -1,4 +1,4 @@
-import { suite, assert } from "./test-util/test.js";
+import { suite, assert } from "./test-utils/test.js";
 import hello from "./index.js";
 
 const test = suite("Index");

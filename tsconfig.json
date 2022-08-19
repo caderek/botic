@@ -9,6 +9,7 @@
     "outDir": "dist",
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "strict": true,
     "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*", "doodle.js"],
