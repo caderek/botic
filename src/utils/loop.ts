@@ -4,18 +4,7 @@ const STOP = Symbol("loop stop");
 
 type Handler = (index: number, value: any) => any;
 
-/*
-  do(index: number, value: any): any;
-  initial?: any;
-  interval?: number;
-  times?: number;
-  step?: number;
-  from?: number;
-  to?: number;
-*/
-
 class Loop {
-  #debug: boolean;
   #iteration: number = 0;
   #counter: number = 0;
   #current: any = null;
@@ -25,9 +14,7 @@ class Loop {
   #interval?: number;
   #hasCustomStep: boolean = false;
 
-  constructor(debug: boolean = false) {
-    this.#debug = debug;
-  }
+  constructor() {}
 
   times(num: number) {
     this.#times = num;
@@ -72,10 +59,6 @@ class Loop {
 
   async do(fn: Handler) {
     while (true) {
-      if (this.#debug) {
-        console.dir({ counter: this.#counter, val: this.#current });
-      }
-
       const result = (await fn(this.#counter, this.#current)) ?? this.#current;
 
       if (
@@ -124,12 +107,10 @@ const loop = {
   do(fn: Handler) {
     return new Loop().do(fn);
   },
-  get debug() {
-    return new Loop(true);
-  },
   get stop() {
     return STOP;
   },
 };
 
+export { Loop };
 export default loop;

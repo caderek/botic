@@ -11,10 +11,13 @@ test("Delays execution for x ms", async () => {
   await delay(input);
   const stop = process.hrtime.bigint();
 
-  const actual = Number((stop - start) / 1_000_000n);
+  const time = Number((stop - start) / 1_000_000n);
 
-  assert.equal(actual >= input, true, "Min delay");
-  assert.equal(actual < input + margin, true, "Delay within margin");
+  const isTotalTimeGreaterOrEqualExpected = time >= input;
+  const isTotalTimeWithinMargin = time < input + margin;
+
+  assert.equal(isTotalTimeGreaterOrEqualExpected, true, "Min delay");
+  assert.equal(isTotalTimeWithinMargin, true, "Delay within margin");
 });
 
 test.run();
