@@ -61,14 +61,18 @@ class Loop {
     while (true) {
       const result = (await fn(this.#counter, this.#current)) ?? this.#current;
 
+      if (result === STOP) {
+        break;
+      }
+
       if (
-        result === STOP ||
         this.#iteration + 1 === this.#times ||
         (this.#to !== undefined &&
           (this.#step < 0
             ? this.#counter + this.#step < this.#to
             : this.#counter + this.#step > this.#to))
       ) {
+        this.#current = result;
         break;
       }
 

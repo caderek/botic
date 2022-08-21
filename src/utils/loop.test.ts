@@ -128,7 +128,7 @@ test("Goes by provided step, negative step", async () => {
 });
 
 test("Runs with provided interval", async () => {
-  const margin = 5; // ms
+  const margin = 10; // ms
   const interval = 10; // ms
   const times = 5;
 
@@ -224,7 +224,7 @@ test("Value is correctly updated by `do` handler - explicit return", async () =>
   const expected = 1024;
 
   const actual = await loop
-    .times(10)
+    .times(9)
     .init(2)
     .do((_, v) => {
       return v * 2;
@@ -257,6 +257,31 @@ test("If there is no explicit return, previous value is used (references)", asyn
     .do((i, v) => {
       v.push(i + 2);
     });
+
+  assert.deepEqual(actual, expected);
+});
+
+test("Nested loops are independent", async () => {
+  const grid = [
+    [1, 2, 3, 4],
+    [5, 6, 7, 8],
+  ];
+  const height = grid.length;
+  const width = grid[0].length;
+
+  const expected = 36;
+
+  const actual = await loop
+    .times(height)
+    .init(0)
+    .do(
+      async (y, full) =>
+        full +
+        (await loop
+          .times(width)
+          .init(0)
+          .do((x, partial) => partial + grid[y][x]))
+    );
 
   assert.deepEqual(actual, expected);
 });
