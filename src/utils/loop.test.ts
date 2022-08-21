@@ -138,10 +138,10 @@ test("Runs with provided interval", async () => {
     .times(times)
     .interval(interval)
     .do((i) => {
-      return i; // empty do function would be result in compiler removing the loop
+      return i; // empty `do` function would be result in compiler removing the loop
     });
-  const stop = process.hrtime.bigint();
 
+  const stop = process.hrtime.bigint();
   const time = Number((stop - start) / 1_000_000n);
 
   const isTotalTimeGreaterOrEqualExpected = time >= (times - 1) * interval;
@@ -218,6 +218,47 @@ test("All options return Loop instance", async () => {
   const actual = instances.every((item) => item instanceof Loop);
 
   assert.deepEqual(actual, true);
+});
+
+test("Value is correctly updated by `do` handler - explicit return", async () => {
+  const expected = 1024;
+
+  const actual = await loop
+    .times(10)
+    .init(2)
+    .do((_, v) => {
+      return v * 2;
+    });
+
+  assert.deepEqual(actual, expected);
+});
+
+test("If there is no explicit return, previous value is used (primitives)", async () => {
+  const expected = 3;
+  let counter;
+
+  const actual = await loop
+    .times(10)
+    .init(3)
+    .do((i, v) => {
+      counter = i;
+    });
+
+  assert.equal(counter, 9); // Use the counter, so the engine doesn't optimize things out
+  assert.deepEqual(actual, expected);
+});
+
+test("If there is no explicit return, previous value is used (references)", async () => {
+  const expected = [1, 2, 3, 4];
+
+  const actual = await loop
+    .times(3)
+    .init([1])
+    .do((i, v) => {
+      v.push(i + 2);
+    });
+
+  assert.deepEqual(actual, expected);
 });
 
 test.run();
