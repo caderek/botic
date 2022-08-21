@@ -57,7 +57,7 @@ class Loop {
     return this;
   }
 
-  async do(fn: Handler) {
+  async doAsync(fn: Handler) {
     while (true) {
       const result = (await fn(this.#counter, this.#current)) ?? this.#current;
 
@@ -86,6 +86,40 @@ class Loop {
     }
 
     return this.#current;
+  }
+
+  doSync(fn: Handler) {
+    while (true) {
+      const result = fn(this.#counter, this.#current) ?? this.#current;
+
+      if (result === STOP) {
+        break;
+      }
+
+      if (
+        this.#iteration + 1 === this.#times ||
+        (this.#to !== undefined &&
+          (this.#step < 0
+            ? this.#counter + this.#step < this.#to
+            : this.#counter + this.#step > this.#to))
+      ) {
+        this.#current = result;
+        break;
+      }
+
+      this.#current = result;
+      this.#iteration++;
+      this.#counter += this.#step;
+    }
+
+    return this.#current;
+  }
+
+  do(fn: Handler) {
+    return Object.prototype.toString.call(fn).slice(8, -1) ===
+      "AsyncFunction" || this.#interval !== undefined
+      ? this.doAsync(fn)
+      : this.doSync(fn);
   }
 }
 

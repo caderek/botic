@@ -3,11 +3,11 @@ import loop, { Loop } from "./loop.js";
 
 const test = suite("Loop");
 
-test("Loops until break signal is returned", async () => {
+test("Loops until break signal is returned", () => {
   const expected = 4;
   let actual;
 
-  await loop.do((i) => {
+  loop.do((i) => {
     if (i === 5) {
       return loop.stop;
     }
@@ -18,22 +18,22 @@ test("Loops until break signal is returned", async () => {
   assert.deepEqual(actual, expected);
 });
 
-test("Loops provided amount of times", async () => {
+test("Loops provided amount of times", () => {
   const expected = 5;
   let actual = 0;
 
-  await loop.times(5).do(() => {
+  loop.times(5).do(() => {
     actual++;
   });
 
   assert.deepEqual(actual, expected);
 });
 
-test("Starts with provided counter value", async () => {
+test("Starts with provided counter value", () => {
   const expected = 7;
   let actual = 0;
 
-  await loop.from(7).do((i) => {
+  loop.from(7).do((i) => {
     actual = i;
     return loop.stop;
   });
@@ -41,55 +41,55 @@ test("Starts with provided counter value", async () => {
   assert.deepEqual(actual, expected);
 });
 
-test("Ends with provided counter value (exact), positive", async () => {
+test("Ends with provided counter value (exact), positive", () => {
   const expected = 9;
   let actual;
 
-  await loop.to(9).do((i) => {
+  loop.to(9).do((i) => {
     actual = i;
   });
 
   assert.deepEqual(actual, expected);
 });
 
-test("Ends with provided counter value (not higher), positive", async () => {
+test("Ends with provided counter value (not higher), positive", () => {
   const expected = 6;
   let actual;
 
-  await loop.to(6.5).do((i) => {
+  loop.to(6.5).do((i) => {
     actual = i;
   });
 
   assert.deepEqual(actual, expected);
 });
 
-test("Ends with provided counter value (exact), negative", async () => {
+test("Ends with provided counter value (exact), negative", () => {
   const expected = -9;
   let actual;
 
-  await loop.to(-9).do((i) => {
+  loop.to(-9).do((i) => {
     actual = i;
   });
 
   assert.deepEqual(actual, expected);
 });
 
-test("Ends with provided counter value (not higher), negative", async () => {
+test("Ends with provided counter value (not higher), negative", () => {
   const expected = -6;
   let actual;
 
-  await loop.to(-6.5).do((i) => {
+  loop.to(-6.5).do((i) => {
     actual = i;
   });
 
   assert.deepEqual(actual, expected);
 });
 
-test("Goes in descending order when target is negative and no step is provided", async () => {
+test("Goes in descending order when target is negative and no step is provided", () => {
   const expected = [2, 1, 0, -1, -2, -3];
   const actual = [];
 
-  await loop
+  loop
     .from(2)
     .to(-3)
     .do((i) => {
@@ -99,11 +99,11 @@ test("Goes in descending order when target is negative and no step is provided",
   assert.deepEqual(actual, expected);
 });
 
-test("Goes by provided step, positive step", async () => {
+test("Goes by provided step, positive step", () => {
   const expected = [0, 3, 6, 9, 12];
   const actual = [];
 
-  await loop
+  loop
     .times(5)
     .step(3)
     .do((i) => {
@@ -113,11 +113,11 @@ test("Goes by provided step, positive step", async () => {
   assert.deepEqual(actual, expected);
 });
 
-test("Goes by provided step, negative step", async () => {
+test("Goes by provided step, negative step", () => {
   const expected = [0, -2.5, -5, -7.5, -10];
   const actual = [];
 
-  await loop
+  loop
     .times(5)
     .step(-2.5)
     .do((i) => {
@@ -151,11 +151,11 @@ test("Runs with provided interval", async () => {
   assert.equal(isTotalTimeWithinMargin, true, "Delay within margin");
 });
 
-test("Sets initial value as provided", async () => {
+test("Sets initial value as provided", () => {
   const expected = "hello";
   let actual;
 
-  await loop
+  loop
     .times(1)
     .init("hello")
     .do((_, v) => {
@@ -165,8 +165,8 @@ test("Sets initial value as provided", async () => {
   assert.deepEqual(actual, expected);
 });
 
-test("Order of options doesn't matter - ascending counter", async () => {
-  const resultA = await loop
+test("Order of options doesn't matter - ascending counter", () => {
+  const resultA = loop
     .from(2)
     .to(10)
     .init([])
@@ -174,7 +174,7 @@ test("Order of options doesn't matter - ascending counter", async () => {
       v.push(i);
     });
 
-  const resultB = await loop
+  const resultB = loop
     .init([])
     .to(10)
     .from(2)
@@ -185,8 +185,8 @@ test("Order of options doesn't matter - ascending counter", async () => {
   assert.deepEqual(resultA, resultB);
 });
 
-test("Order of options doesn't matter - descending counter", async () => {
-  const resultA = await loop
+test("Order of options doesn't matter - descending counter", () => {
+  const resultA = loop
     .from(2)
     .to(-10)
     .init([])
@@ -194,7 +194,7 @@ test("Order of options doesn't matter - descending counter", async () => {
       v.push(i);
     });
 
-  const resultB = await loop
+  const resultB = loop
     .init([])
     .to(-10)
     .from(2)
@@ -205,7 +205,7 @@ test("Order of options doesn't matter - descending counter", async () => {
   assert.deepEqual(resultA, resultB);
 });
 
-test("All options return Loop instance", async () => {
+test("All options return Loop instance", () => {
   const instances = [
     loop.times(1),
     loop.from(1),
@@ -220,10 +220,10 @@ test("All options return Loop instance", async () => {
   assert.deepEqual(actual, true);
 });
 
-test("Value is correctly updated by `do` handler - explicit return", async () => {
+test("Value is correctly updated by `do` handler - explicit return", () => {
   const expected = 1024;
 
-  const actual = await loop
+  const actual = loop
     .times(9)
     .init(2)
     .do((_, v) => {
@@ -233,11 +233,11 @@ test("Value is correctly updated by `do` handler - explicit return", async () =>
   assert.deepEqual(actual, expected);
 });
 
-test("If there is no explicit return, previous value is used (primitives)", async () => {
+test("If there is no explicit return, previous value is used (primitives)", () => {
   const expected = 3;
   let counter;
 
-  const actual = await loop
+  const actual = loop
     .times(10)
     .init(3)
     .do((i, v) => {
@@ -248,10 +248,10 @@ test("If there is no explicit return, previous value is used (primitives)", asyn
   assert.deepEqual(actual, expected);
 });
 
-test("If there is no explicit return, previous value is used (references)", async () => {
+test("If there is no explicit return, previous value is used (references)", () => {
   const expected = [1, 2, 3, 4];
 
-  const actual = await loop
+  const actual = loop
     .times(3)
     .init([1])
     .do((i, v) => {
@@ -261,7 +261,7 @@ test("If there is no explicit return, previous value is used (references)", asyn
   assert.deepEqual(actual, expected);
 });
 
-test("Nested loops are independent", async () => {
+test("Nested loops are independent", () => {
   const grid = [
     [1, 2, 3, 4],
     [5, 6, 7, 8],
@@ -271,17 +271,27 @@ test("Nested loops are independent", async () => {
 
   const expected = 36;
 
-  const actual = await loop
+  const actual = loop
     .times(height)
     .init(0)
     .do(
-      async (y, full) =>
+      (y, full) =>
         full +
-        (await loop
+        loop
           .times(width)
           .init(0)
-          .do((x, partial) => partial + grid[y][x]))
+          .do((x, partial) => partial + grid[y][x])
     );
+
+  let sum = 0;
+
+  loop.times(height).do((y) => {
+    loop.times(width).do((x) => {
+      sum += grid[y][x];
+    });
+  });
+
+  console.log({ sum });
 
   assert.deepEqual(actual, expected);
 });
