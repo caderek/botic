@@ -14,9 +14,7 @@ class Loop {
   #interval: number = 0;
   #init: any = null;
 
-  constructor(isAsync: boolean = false) {
-    this.#isAsync = isAsync;
-  }
+  constructor() {}
 
   times(num: number) {
     this.#times = num;
@@ -160,7 +158,7 @@ const loop = {
     return new Loop().step(num);
   },
   interval(ms: number) {
-    return new Loop(true).interval(ms);
+    return new Loop().interval(ms);
   },
   init(val: any) {
     return new Loop().init(val);
