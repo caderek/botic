@@ -5,16 +5,18 @@ const STOP = Symbol("loop stop");
 type Handler = (index: number, value: any) => any;
 
 class Loop {
-  #iteration: number = 0;
-  #counter: number = 0;
-  #current: any = null;
-  #times: number = Infinity;
-  #to?: number;
-  #step: number = 1;
-  #interval?: number;
   #hasCustomStep: boolean = false;
+  #isAsync: boolean = false;
+  #times: number = Infinity;
+  #from: number = 0;
+  #to: number = Infinity;
+  #step: number = 1;
+  #interval: number = 0;
+  #init: any = null;
 
-  constructor() {}
+  constructor(isAsync: boolean = false) {
+    this.#isAsync = isAsync;
+  }
 
   times(num: number) {
     this.#times = num;
@@ -22,22 +24,12 @@ class Loop {
   }
 
   from(start: number) {
-    this.#counter = start;
-
-    if (this.#to !== undefined && !this.#hasCustomStep) {
-      this.#step = this.#to < start ? -1 : 1;
-    }
-
+    this.#from = start;
     return this;
   }
 
   to(finish: number) {
     this.#to = finish;
-
-    if (!this.#hasCustomStep) {
-      this.#step = finish < this.#counter ? -1 : 1;
-    }
-
     return this;
   }
 
@@ -49,77 +41,108 @@ class Loop {
 
   interval(ms: number) {
     this.#interval = ms;
+    this.#isAsync = true;
     return this;
   }
 
   init(val: any) {
-    this.#current = val;
+    this.#init = val;
     return this;
   }
 
-  async doAsync(fn: Handler) {
-    while (true) {
-      const result = (await fn(this.#counter, this.#current)) ?? this.#current;
-
-      if (result === STOP) {
-        break;
-      }
-
-      if (
-        this.#iteration + 1 === this.#times ||
-        (this.#to !== undefined &&
-          (this.#step < 0
-            ? this.#counter + this.#step < this.#to
-            : this.#counter + this.#step > this.#to))
-      ) {
-        this.#current = result;
-        break;
-      }
-
-      this.#current = result;
-      this.#iteration++;
-      this.#counter += this.#step;
-
-      if (this.#interval !== undefined) {
-        await delay(this.#interval);
-      }
+  #prepareStep() {
+    if (!this.#hasCustomStep) {
+      return this.#to > this.#from ? 1 : -1;
     }
 
-    return this.#current;
+    return this.#step;
   }
 
-  doSync(fn: Handler) {
+  #prepareTo() {
+    if (this.#to === Infinity && this.#step < 0) {
+      return -Infinity;
+    }
+
+    return this.#to;
+  }
+
+  async doAsync(fn: Handler, firstResult: any) {
+    const times = this.#times;
+    const interval = this.#interval;
+    const to = this.#prepareTo();
+    const step = this.#prepareStep();
+
+    let i = 0;
+    let counter = this.#from;
+    let current = this.#init;
+
     while (true) {
-      const result = fn(this.#counter, this.#current) ?? this.#current;
+      const result = await (i === 0 ? firstResult : fn(counter, current));
 
       if (result === STOP) {
         break;
       }
 
+      current = result === undefined ? current : result;
+
       if (
-        this.#iteration + 1 === this.#times ||
-        (this.#to !== undefined &&
-          (this.#step < 0
-            ? this.#counter + this.#step < this.#to
-            : this.#counter + this.#step > this.#to))
+        i + 1 === times ||
+        (step < 0 ? counter + step < to : counter + step > to)
       ) {
-        this.#current = result;
         break;
       }
 
-      this.#current = result;
-      this.#iteration++;
-      this.#counter += this.#step;
+      i++;
+      counter += step;
+
+      if (interval) {
+        await delay(interval);
+      }
     }
 
-    return this.#current;
+    return current;
+  }
+
+  doSync(fn: Handler, firstResult: any) {
+    const times = this.#times;
+    const to = this.#prepareTo();
+    const step = this.#prepareStep();
+
+    let i = 0;
+    let counter = this.#from;
+    let current = this.#init;
+
+    while (true) {
+      const result = i === 0 ? firstResult : fn(counter, current);
+
+      if (result === STOP) {
+        break;
+      }
+
+      current = result === undefined ? current : result;
+
+      if (
+        i + 1 === times ||
+        (step < 0 ? counter + step < to : counter + step > to)
+      ) {
+        break;
+      }
+
+      i++;
+      counter += step;
+    }
+
+    return current;
   }
 
   do(fn: Handler) {
-    return Object.prototype.toString.call(fn).slice(8, -1) ===
-      "AsyncFunction" || this.#interval !== undefined
-      ? this.doAsync(fn)
-      : this.doSync(fn);
+    const first = fn(this.#from, this.#init);
+
+    if (first instanceof Promise) {
+      this.#isAsync = true;
+    }
+
+    return this.#isAsync ? this.doAsync(fn, first) : this.doSync(fn, first);
   }
 }
 
@@ -137,7 +160,7 @@ const loop = {
     return new Loop().step(num);
   },
   interval(ms: number) {
-    return new Loop().interval(ms);
+    return new Loop(true).interval(ms);
   },
   init(val: any) {
     return new Loop().init(val);

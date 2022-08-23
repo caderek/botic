@@ -127,30 +127,6 @@ test("Goes by provided step, negative step", () => {
   assert.deepEqual(actual, expected);
 });
 
-test("Runs with provided interval", async () => {
-  const margin = 10; // ms
-  const interval = 10; // ms
-  const times = 5;
-
-  const start = process.hrtime.bigint();
-
-  await loop
-    .times(times)
-    .interval(interval)
-    .do((i) => {
-      return i; // empty `do` function would be result in compiler removing the loop
-    });
-
-  const stop = process.hrtime.bigint();
-  const time = Number((stop - start) / 1_000_000n);
-
-  const isTotalTimeGreaterOrEqualExpected = time >= (times - 1) * interval;
-  const isTotalTimeWithinMargin = time < (times - 1) * interval + margin;
-
-  assert.equal(isTotalTimeGreaterOrEqualExpected, true, "Min delay");
-  assert.equal(isTotalTimeWithinMargin, true, "Delay within margin");
-});
-
 test("Sets initial value as provided", () => {
   const expected = "hello";
   let actual;
@@ -283,15 +259,92 @@ test("Nested loops are independent", () => {
           .do((x, partial) => partial + grid[y][x])
     );
 
-  let sum = 0;
+  assert.deepEqual(actual, expected);
+});
 
-  loop.times(height).do((y) => {
-    loop.times(width).do((x) => {
-      sum += grid[y][x];
+test("Runs with provided interval (implicit async)", async () => {
+  const margin = 10; // ms
+  const interval = 10; // ms
+  const times = 5;
+
+  const start = process.hrtime.bigint();
+
+  await loop
+    .times(times)
+    .interval(interval)
+    .do((i) => {
+      return i;
     });
-  });
 
-  console.log({ sum });
+  const stop = process.hrtime.bigint();
+  const time = Number((stop - start) / 1_000_000n);
+
+  const isTotalTimeGreaterOrEqualExpected = time >= (times - 1) * interval;
+  const isTotalTimeWithinMargin = time < (times - 1) * interval + margin;
+
+  assert.equal(isTotalTimeGreaterOrEqualExpected, true, "Min delay");
+  assert.equal(isTotalTimeWithinMargin, true, "Delay within margin");
+});
+
+test("Runs with provided interval - with custom break (implicit async)", async () => {
+  const margin = 50; // ms
+  const interval = 50; // ms
+  const times = 5;
+
+  const start = process.hrtime.bigint();
+
+  await loop
+    .from(1)
+    .interval(interval)
+    .do((i) => {
+      return i === times ? loop.stop : i;
+    });
+
+  const stop = process.hrtime.bigint();
+  const time = Number((stop - start) / 1_000_000n);
+
+  const isTotalTimeGreaterOrEqualExpected = time >= (times - 1) * interval;
+  const isTotalTimeWithinMargin = time < (times - 1) * interval + margin;
+
+  assert.equal(isTotalTimeGreaterOrEqualExpected, true, "Min delay");
+  assert.equal(isTotalTimeWithinMargin, true, "Delay within margin");
+});
+
+test("Resolves returned Promises between iterations (implicit async)", async () => {
+  const expected = 16;
+
+  const actual = await loop
+    .times(3)
+    .init(2)
+    .do(async (_, v) => {
+      return v * 2;
+    });
+
+  assert.equal(actual, expected);
+});
+
+test("Resolves returned Promises - no explicit return (implicit async)", async () => {
+  const expected = [1, 2, 3];
+
+  const actual = await loop
+    .times(3)
+    .init([])
+    .do(async (i, v) => {
+      v.push(i + 1);
+    });
+
+  assert.deepEqual(actual, expected);
+});
+
+test("Resolves returned Promises - negative step (implicit async)", async () => {
+  const expected = 16;
+
+  const actual = await loop
+    .to(-2)
+    .init(2)
+    .do(async (_, v) => {
+      return v * 2;
+    });
 
   assert.deepEqual(actual, expected);
 });
