@@ -66,7 +66,7 @@ class Loop {
     return this.#to;
   }
 
-  async doAsync(fn: Handler, firstResult: any) {
+  async #doAsync(fn: Handler, firstResult: any) {
     const times = this.#times;
     const interval = this.#interval;
     const to = this.#prepareTo();
@@ -103,7 +103,7 @@ class Loop {
     return current;
   }
 
-  doSync(fn: Handler, firstResult: any) {
+  #doSync(fn: Handler, firstResult: any) {
     const times = this.#times;
     const to = this.#prepareTo();
     const step = this.#prepareStep();
@@ -142,7 +142,7 @@ class Loop {
       this.#isAsync = true;
     }
 
-    return this.#isAsync ? this.doAsync(fn, first) : this.doSync(fn, first);
+    return this.#isAsync ? this.#doAsync(fn, first) : this.#doSync(fn, first);
   }
 }
 
