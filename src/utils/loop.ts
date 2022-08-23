@@ -12,7 +12,7 @@ class Loop {
   #to: number = Infinity;
   #step: number = 1;
   #interval: number = 0;
-  #init: any = null;
+  #init: any;
 
   constructor() {}
 
