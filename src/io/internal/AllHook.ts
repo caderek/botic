@@ -1,7 +1,12 @@
-import { uIOhook, UiohookMouseEvent } from "uiohook-napi";
+import {
+  uIOhook,
+  UiohookMouseEvent,
+  UiohookWheelEvent,
+  UiohookKeyboardEvent,
+} from "uiohook-napi";
 import { HooksState } from "./types";
 
-class MouseMoveHook {
+class AllHook {
   #once: boolean = false;
   #state: HooksState;
   #alt: boolean = false;
@@ -38,10 +43,16 @@ class MouseMoveHook {
     return this;
   }
 
-  do(handler: (e: UiohookMouseEvent) => void) {
+  do(
+    handler: (
+      e: UiohookMouseEvent | UiohookWheelEvent | UiohookKeyboardEvent
+    ) => void
+  ) {
     let _isActive = true;
 
-    const fn = (e: UiohookMouseEvent) => {
+    const fn = (
+      e: UiohookMouseEvent | UiohookWheelEvent | UiohookKeyboardEvent
+    ) => {
       if (
         e.altKey === this.#alt &&
         e.ctrlKey === this.#ctrl &&
@@ -51,13 +62,13 @@ class MouseMoveHook {
         handler(e);
 
         if (this.#once) {
-          uIOhook.off("mousemove", fn);
+          uIOhook.off("input", fn);
           _isActive = false;
         }
       }
     };
 
-    uIOhook.on("mousemove", fn);
+    uIOhook.on("input", fn);
 
     if (!this.#state.isRunning) {
       uIOhook.start();
@@ -70,25 +81,23 @@ class MouseMoveHook {
       },
       stop() {
         if (_isActive) {
-          uIOhook.off("mousemove", fn);
+          uIOhook.off("input", fn);
           _isActive = false;
         }
       },
       start() {
         if (!this.isActive) {
-          uIOhook.on("mousemove", fn);
+          uIOhook.on("input", fn);
           _isActive = true;
         }
       },
       toggle() {
         const type = this.isActive ? "off" : "on";
-        uIOhook[type]("mousemove", fn);
+        uIOhook[type]("input", fn);
         _isActive = !_isActive;
       },
     };
   }
 }
 
-uIOhook.on("input", console.log);
-
-export default MouseMoveHook;
+export default AllHook;

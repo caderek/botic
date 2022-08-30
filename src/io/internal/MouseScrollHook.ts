@@ -1,8 +1,8 @@
-import { uIOhook, UiohookMouseEvent } from "uiohook-napi";
+import { uIOhook, UiohookWheelEvent } from "uiohook-napi";
 import { MouseButton } from "./constants.js";
 import { HooksState } from "./types";
 
-class MouseUpDownHook {
+class MouseScrollHook {
   #once: boolean = false;
   #button: MouseButton = MouseButton.ANY;
   #state: HooksState;
@@ -10,11 +10,10 @@ class MouseUpDownHook {
   #ctrl: boolean = false;
   #meta: boolean = false;
   #shift: boolean = false;
-  #variant: "mousedown" | "mouseup";
+  #rotation: number = 0;
 
-  constructor(state: HooksState, variant: "mousedown" | "mouseup") {
+  constructor(state: HooksState) {
     this.#state = state;
-    this.#variant = variant;
   }
 
   get once() {
@@ -22,18 +21,13 @@ class MouseUpDownHook {
     return this;
   }
 
-  get left() {
-    this.#button = MouseButton.LEFT;
+  get up() {
+    this.#rotation = -1;
     return this;
   }
 
-  get right() {
-    this.#button = MouseButton.RIGHT;
-    return this;
-  }
-
-  get middle() {
-    this.#button = MouseButton.MIDDLE;
+  get down() {
+    this.#rotation = 1;
     return this;
   }
 
@@ -57,13 +51,12 @@ class MouseUpDownHook {
     return this;
   }
 
-  do(handler: (e: UiohookMouseEvent) => void) {
+  do(handler: (e: UiohookWheelEvent) => void) {
     let _isActive = true;
-    const variant = this.#variant;
 
-    const fn = (e: UiohookMouseEvent) => {
+    const fn = (e: UiohookWheelEvent) => {
       if (
-        (this.#button === MouseButton.ANY || e.button === this.#button) &&
+        (this.#rotation === 0 || e.rotation === this.#rotation) &&
         e.altKey === this.#alt &&
         e.ctrlKey === this.#ctrl &&
         e.metaKey === this.#meta &&
@@ -72,14 +65,13 @@ class MouseUpDownHook {
         handler(e);
 
         if (this.#once) {
-          uIOhook.off(variant, fn);
+          uIOhook.off("wheel", fn);
           _isActive = false;
         }
       }
     };
 
-    // @ts-ignore
-    uIOhook.on(variant, fn);
+    uIOhook.on("wheel", fn);
 
     if (!this.#state.isRunning) {
       uIOhook.start();
@@ -92,25 +84,23 @@ class MouseUpDownHook {
       },
       stop() {
         if (_isActive) {
-          uIOhook.off(variant, fn);
+          uIOhook.off("wheel", fn);
           _isActive = false;
         }
       },
       start() {
         if (!this.isActive) {
-          // @ts-ignore
-          uIOhook.on(variant, fn);
+          uIOhook.on("wheel", fn);
           _isActive = true;
         }
       },
       toggle() {
         const type = this.isActive ? "off" : "on";
-        // @ts-ignore
-        uIOhook[type](variant, fn);
+        uIOhook[type]("wheel", fn);
         _isActive = !_isActive;
       },
     };
   }
 }
 
-export default MouseUpDownHook;
+export default MouseScrollHook;

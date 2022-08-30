@@ -1,7 +1,8 @@
+import AllHook from "./internal/AllHook.js";
 import MouseClickHook from "./internal/MouseClickHook.js";
 import MouseMoveHook from "./internal/MouseMoveHook.js";
-import MouseUpDownHook from "./internal/MouseUpDownHook.js";
-import MouseWheelHook from "./internal/MouseWheelHook.js";
+import MousePressReleaseHook from "./internal/MousePressReleaseHook.js";
+import MouseWheelHook from "./internal/MouseScrollHook.js";
 
 const state = {
   isRunning: false,
@@ -14,11 +15,11 @@ const listen = {
     },
 
     get press() {
-      return new MouseUpDownHook(state, "mousedown");
+      return new MousePressReleaseHook(state, "mousedown");
     },
 
     get release() {
-      return new MouseUpDownHook(state, "mouseup");
+      return new MousePressReleaseHook(state, "mouseup");
     },
 
     get scroll() {
@@ -28,6 +29,17 @@ const listen = {
     get move() {
       return new MouseMoveHook(state);
     },
+  },
+  key: {
+    get press() {
+      return 1;
+    },
+    get release() {
+      return 1;
+    },
+  },
+  get all() {
+    return new AllHook(state);
   },
 };
 
