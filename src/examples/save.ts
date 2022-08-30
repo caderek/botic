@@ -47,9 +47,11 @@ const myHook = listen.mouse.click.left.double.ctrl.shift.do(async (e) => {
 
 myHook.stop();
 
-listen.mouse.wheel.up.alt.do((e) => {
+listen.mouse.scroll.up.alt.do((e) => {
   console.log(e);
 });
+
+listen.mouse.move.ctrl.do(console.log);
 
 // myHook.start();
 
