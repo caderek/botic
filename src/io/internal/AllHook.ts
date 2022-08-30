@@ -54,10 +54,11 @@ class AllHook {
       e: UiohookMouseEvent | UiohookWheelEvent | UiohookKeyboardEvent
     ) => {
       if (
-        e.altKey === this.#alt &&
-        e.ctrlKey === this.#ctrl &&
-        e.metaKey === this.#meta &&
-        e.shiftKey === this.#shift
+        (!this.#alt && !this.#ctrl && !this.#meta && !this.#shift) ||
+        (e.altKey === this.#alt &&
+          e.ctrlKey === this.#ctrl &&
+          e.metaKey === this.#meta &&
+          e.shiftKey === this.#shift)
       ) {
         handler(e);
 
