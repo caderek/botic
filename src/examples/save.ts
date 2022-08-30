@@ -14,6 +14,7 @@ import {
   Key,
 } from "@nut-tree/nut-js";
 import "@nut-tree/template-matcher";
+import logUpdate from "log-update";
 import delay from "../utils/delay.js";
 import loop from "../utils/loop.js";
 import tap from "../io/tap.js";
@@ -45,7 +46,9 @@ import listen from "../io/listen.js";
 //   // });
 // });
 
-listen.all.ctrl.alt.do(console.log);
+listen.all.do((e) => {
+  logUpdate(JSON.stringify(e, null, 2));
+});
 
 // myHook.start();
 
