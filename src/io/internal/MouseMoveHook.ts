@@ -89,6 +89,4 @@ class MouseMoveHook {
   }
 }
 
-uIOhook.on("input", console.log);
-
 export default MouseMoveHook;
