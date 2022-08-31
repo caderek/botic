@@ -46,12 +46,22 @@ import listen from "../io/listen.js";
 //   // });
 // });
 
-listen.all.do((e) => {
-  logUpdate(JSON.stringify(e, null, 2));
-});
+// listen.all.do((e) => {
+//   logUpdate(JSON.stringify(e, null, 2));
+// });
 
 // myHook.start();
 
 // uIOhook.on("click", (e) => {
 //   console.log(e);
 // });
+
+// await delay(1000);
+// await keyboard.pressKey(Key.A);
+// await keyboard.releaseKey(Key.A);
+// await delay(1000);
+// await mouse.setPosition(new Point(10, 10));
+
+listen.mouse.click.double.left.do(() => {
+  console.log("Double Click!");
+});

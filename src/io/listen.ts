@@ -1,4 +1,4 @@
-import AllHook from "./internal/AllHook.js";
+import UniversalHook from "./internal/UniversalHook.js";
 import MouseClickHook from "./internal/MouseClickHook.js";
 import MouseMoveHook from "./internal/MouseMoveHook.js";
 import MousePressReleaseHook from "./internal/MousePressReleaseHook.js";
@@ -39,7 +39,7 @@ const listen = {
     },
   },
   get all() {
-    return new AllHook(state);
+    return new UniversalHook(state);
   },
 };
 

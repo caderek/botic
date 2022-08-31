@@ -6,7 +6,7 @@ import {
 } from "uiohook-napi";
 import { HooksState } from "./types";
 
-class AllHook {
+class UniversalHook {
   #once: boolean = false;
   #state: HooksState;
   #alt: boolean = false;
@@ -101,4 +101,4 @@ class AllHook {
   }
 }
 
-export default AllHook;
+export default UniversalHook;
