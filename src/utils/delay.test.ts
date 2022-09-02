@@ -4,7 +4,7 @@ import delay from "./delay.js";
 const test = suite("Delay");
 
 test("Delays execution for x ms", async () => {
-  const margin = 5; // ms
+  const margin = 10; // ms
   const input = 10; // ms
 
   const start = process.hrtime.bigint();

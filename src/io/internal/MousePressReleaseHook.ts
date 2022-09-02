@@ -1,18 +1,18 @@
 import { uIOhook, UiohookMouseEvent } from "uiohook-napi";
 import { MouseButton } from "./constants.js";
-import { HooksState } from "./types";
+import { MainHook } from "./types";
 
 class MousePressReleaseHook {
   #once: boolean = false;
-  #button: MouseButton = MouseButton.ANY;
-  #state: HooksState;
+  #button: MouseButton = MouseButton.NONE;
+  #state: MainHook;
   #alt: boolean = false;
   #ctrl: boolean = false;
   #meta: boolean = false;
   #shift: boolean = false;
   #variant: "mousedown" | "mouseup";
 
-  constructor(state: HooksState, variant: "mousedown" | "mouseup") {
+  constructor(state: MainHook, variant: "mousedown" | "mouseup") {
     this.#state = state;
     this.#variant = variant;
   }
@@ -63,7 +63,7 @@ class MousePressReleaseHook {
 
     const fn = (e: UiohookMouseEvent) => {
       if (
-        (this.#button === MouseButton.ANY || e.button === this.#button) &&
+        (this.#button === MouseButton.NONE || e.button === this.#button) &&
         e.altKey === this.#alt &&
         e.ctrlKey === this.#ctrl &&
         e.metaKey === this.#meta &&

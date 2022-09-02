@@ -4,30 +4,26 @@ import MouseMoveHook from "./internal/MouseMoveHook.js";
 import MousePressReleaseHook from "./internal/MousePressReleaseHook.js";
 import MouseWheelHook from "./internal/MouseScrollHook.js";
 
-const state = {
-  isRunning: false,
-};
-
 const listen = {
   mouse: {
     get click() {
-      return new MouseClickHook(state);
+      return new MouseClickHook();
     },
 
     get press() {
-      return new MousePressReleaseHook(state, "mousedown");
+      return new MousePressReleaseHook("mousedown");
     },
 
     get release() {
-      return new MousePressReleaseHook(state, "mouseup");
+      return new MousePressReleaseHook("mouseup");
     },
 
     get scroll() {
-      return new MouseWheelHook(state);
+      return new MouseWheelHook();
     },
 
     get move() {
-      return new MouseMoveHook(state);
+      return new MouseMoveHook();
     },
   },
   key: {
@@ -39,7 +35,7 @@ const listen = {
     },
   },
   get all() {
-    return new UniversalHook(state);
+    return new UniversalHook();
   },
 };
 

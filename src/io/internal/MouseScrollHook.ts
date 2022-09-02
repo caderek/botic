@@ -1,19 +1,19 @@
 import { uIOhook, UiohookWheelEvent } from "uiohook-napi";
-import { MouseButton } from "./constants.js";
-import { HooksState } from "./types";
+import IOHandle from "./IOHandle.js";
+import { GlobalScrollEvent, Hook } from "./types";
 
-class MouseScrollHook {
+class MouseScrollHook implements Hook {
+  #id: Symbol;
   #once: boolean = false;
-  #button: MouseButton = MouseButton.ANY;
-  #state: HooksState;
   #alt: boolean = false;
   #ctrl: boolean = false;
   #meta: boolean = false;
   #shift: boolean = false;
   #rotation: number = 0;
+  #direction: "HORIZONTAL" | "VERTICAL" | "ANY" = "ANY";
 
-  constructor(state: HooksState) {
-    this.#state = state;
+  constructor() {
+    this.#id = Symbol();
   }
 
   get once() {
@@ -28,6 +28,16 @@ class MouseScrollHook {
 
   get down() {
     this.#rotation = 1;
+    return this;
+  }
+
+  get vertical() {
+    this.#direction = "VERTICAL";
+    return this;
+  }
+
+  get horizontal() {
+    this.#direction = "HORIZONTAL";
     return this;
   }
 
@@ -51,55 +61,16 @@ class MouseScrollHook {
     return this;
   }
 
-  do(handler: (e: UiohookWheelEvent) => void) {
-    let _isActive = true;
+  do(handler: (e: GlobalScrollEvent) => void) {
+    const predicate = (e: GlobalScrollEvent) =>
+      (this.#rotation === 0 || e.rotation === this.#rotation) &&
+      (this.#direction === "ANY" || e.direction === this.#direction) &&
+      e.alt === this.#alt &&
+      e.ctrl === this.#ctrl &&
+      e.meta === this.#meta &&
+      e.shift === this.#shift;
 
-    const fn = (e: UiohookWheelEvent) => {
-      if (
-        (this.#rotation === 0 || e.rotation === this.#rotation) &&
-        e.altKey === this.#alt &&
-        e.ctrlKey === this.#ctrl &&
-        e.metaKey === this.#meta &&
-        e.shiftKey === this.#shift
-      ) {
-        handler(e);
-
-        if (this.#once) {
-          uIOhook.off("wheel", fn);
-          _isActive = false;
-        }
-      }
-    };
-
-    uIOhook.on("wheel", fn);
-
-    if (!this.#state.isRunning) {
-      uIOhook.start();
-      this.#state.isRunning = true;
-    }
-
-    return {
-      get isActive() {
-        return _isActive;
-      },
-      stop() {
-        if (_isActive) {
-          uIOhook.off("wheel", fn);
-          _isActive = false;
-        }
-      },
-      start() {
-        if (!this.isActive) {
-          uIOhook.on("wheel", fn);
-          _isActive = true;
-        }
-      },
-      toggle() {
-        const type = this.isActive ? "off" : "on";
-        uIOhook[type]("wheel", fn);
-        _isActive = !_isActive;
-      },
-    };
+    return new IOHandle(this.#id, "wheel", predicate, handler, this.#once);
   }
 }
 

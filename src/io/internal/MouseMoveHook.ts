@@ -1,15 +1,15 @@
 import { uIOhook, UiohookMouseEvent } from "uiohook-napi";
-import { HooksState } from "./types";
+import { MainHook } from "./types";
 
 class MouseMoveHook {
   #once: boolean = false;
-  #state: HooksState;
+  #state: MainHook;
   #alt: boolean = false;
   #ctrl: boolean = false;
   #meta: boolean = false;
   #shift: boolean = false;
 
-  constructor(state: HooksState) {
+  constructor(state: MainHook) {
     this.#state = state;
   }
 

@@ -1,19 +1,21 @@
-import { uIOhook, UiohookMouseEvent } from "uiohook-napi";
+import { uIOhook } from "uiohook-napi";
 import { MouseButton } from "./constants.js";
-import { HooksState } from "./types";
+import { MainHook, Hook, GlobalMouseEvent } from "./types";
 
-class MouseClickHook {
+class MouseClickHook implements Hook {
   #once: boolean = false;
   #clicks: number = 1;
-  #button: MouseButton = MouseButton.ANY;
-  #state: HooksState;
+  #button: MouseButton = MouseButton.NONE;
+  #mainHook: MainHook;
   #alt: boolean = false;
   #ctrl: boolean = false;
   #meta: boolean = false;
   #shift: boolean = false;
+  #id: Symbol;
 
-  constructor(state: HooksState) {
-    this.#state = state;
+  constructor(mainHook: MainHook) {
+    this.#mainHook = mainHook;
+    this.#id = Symbol();
   }
 
   get once() {
@@ -66,12 +68,13 @@ class MouseClickHook {
     return this;
   }
 
-  do(handler: (e: UiohookMouseEvent) => void) {
+  do(handler: (e: GlobalMouseEvent) => void) {
     let _isActive = true;
+    this.#mainHook.start(this.#id);
 
-    const fn = (e: UiohookMouseEvent) => {
+    const fn = (e: GlobalMouseEvent) => {
       if (
-        (this.#button === MouseButton.ANY || e.button === this.#button) &&
+        (this.#button === MouseButton.NONE || e.button === this.#button) &&
         (this.#clicks === 1 || e.clicks === this.#clicks) &&
         e.altKey === this.#alt &&
         e.ctrlKey === this.#ctrl &&
@@ -89,29 +92,26 @@ class MouseClickHook {
 
     uIOhook.on("click", fn);
 
-    if (!this.#state.isRunning) {
-      uIOhook.start();
-      this.#state.isRunning = true;
-    }
-
     return {
       get isActive() {
         return _isActive;
       },
-      stop() {
+      stop: () => {
         if (_isActive) {
+          this.#mainHook.stop(this.#id);
           uIOhook.off("click", fn);
           _isActive = false;
         }
       },
-      start() {
-        if (!this.isActive) {
+      start: () => {
+        if (!_isActive) {
+          this.#mainHook.start(this.#id);
           uIOhook.on("click", fn);
           _isActive = true;
         }
       },
-      toggle() {
-        const type = this.isActive ? "off" : "on";
+      toggle: () => {
+        const type = _isActive ? "off" : "on";
         uIOhook[type]("click", fn);
         _isActive = !_isActive;
       },

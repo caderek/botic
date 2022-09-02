@@ -1,21 +1,16 @@
-import {
-  uIOhook,
-  UiohookMouseEvent,
-  UiohookWheelEvent,
-  UiohookKeyboardEvent,
-} from "uiohook-napi";
-import { HooksState } from "./types";
+import IOHandle from "./IOHandle.js";
+import { Hook, GlobalInputEvent } from "./types";
 
-class UniversalHook {
+class UniversalHook implements Hook {
+  #id: Symbol;
   #once: boolean = false;
-  #state: HooksState;
   #alt: boolean = false;
   #ctrl: boolean = false;
   #meta: boolean = false;
   #shift: boolean = false;
 
-  constructor(state: HooksState) {
-    this.#state = state;
+  constructor() {
+    this.#id = Symbol();
   }
 
   get once() {
@@ -43,61 +38,15 @@ class UniversalHook {
     return this;
   }
 
-  do(
-    handler: (
-      e: UiohookMouseEvent | UiohookWheelEvent | UiohookKeyboardEvent
-    ) => void
-  ) {
-    let _isActive = true;
+  do(handler: (e: GlobalInputEvent) => void) {
+    const predicate = (e: GlobalInputEvent) =>
+      (!this.#alt && !this.#ctrl && !this.#meta && !this.#shift) ||
+      (e.alt === this.#alt &&
+        e.ctrl === this.#ctrl &&
+        e.meta === this.#meta &&
+        e.shift === this.#shift);
 
-    const fn = (
-      e: UiohookMouseEvent | UiohookWheelEvent | UiohookKeyboardEvent
-    ) => {
-      if (
-        (!this.#alt && !this.#ctrl && !this.#meta && !this.#shift) ||
-        (e.altKey === this.#alt &&
-          e.ctrlKey === this.#ctrl &&
-          e.metaKey === this.#meta &&
-          e.shiftKey === this.#shift)
-      ) {
-        handler(e);
-
-        if (this.#once) {
-          uIOhook.off("input", fn);
-          _isActive = false;
-        }
-      }
-    };
-
-    uIOhook.on("input", fn);
-
-    if (!this.#state.isRunning) {
-      uIOhook.start();
-      this.#state.isRunning = true;
-    }
-
-    return {
-      get isActive() {
-        return _isActive;
-      },
-      stop() {
-        if (_isActive) {
-          uIOhook.off("input", fn);
-          _isActive = false;
-        }
-      },
-      start() {
-        if (!this.isActive) {
-          uIOhook.on("input", fn);
-          _isActive = true;
-        }
-      },
-      toggle() {
-        const type = this.isActive ? "off" : "on";
-        uIOhook[type]("input", fn);
-        _isActive = !_isActive;
-      },
-    };
+    return new IOHandle(this.#id, "input", predicate, handler, this.#once);
   }
 }
 
