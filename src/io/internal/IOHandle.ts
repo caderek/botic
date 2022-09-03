@@ -13,25 +13,16 @@ import {
   WheelEventType,
   MouseButton,
   KeysNames,
+  VerticalScroll,
+  HorizontalScroll,
 } from "./constants.js";
 
-import {
-  HookHandle,
-  GlobalInputEvent,
-  GlobalMouseEvent,
-  GlobalKeyboardEvent,
-  GlobalScrollEvent,
-} from "./types";
+import { HookHandle, GlobalInputEvent } from "./types";
 
 type UiohookInputEvent =
   | UiohookMouseEvent
   | UiohookWheelEvent
   | UiohookKeyboardEvent;
-
-type Predicate =
-  | ((e: GlobalMouseEvent) => boolean)
-  | ((e: GlobalKeyboardEvent) => boolean)
-  | ((e: GlobalScrollEvent) => boolean);
 
 let isRunning = false;
 const listeners = new Set();
@@ -77,6 +68,7 @@ const prepareEvent = (e: UiohookInputEvent): GlobalInputEvent => {
         key: e.keycode,
         keyName: KeysNames.get(e.keycode) ?? "OTHER",
       };
+
     case EventType.EVENT_MOUSE_WHEEL:
       return {
         type: WheelEventType[e.type] as keyof typeof WheelEventType,
@@ -85,10 +77,14 @@ const prepareEvent = (e: UiohookInputEvent): GlobalInputEvent => {
         meta: e.metaKey,
         shift: e.shiftKey,
         direction: WheelDirection[e.direction] as keyof typeof WheelDirection,
-        rotation: e.rotation,
+        rotation:
+          e.direction === WheelDirection.VERTICAL
+            ? (VerticalScroll[e.rotation] as keyof typeof VerticalScroll)
+            : (HorizontalScroll[e.rotation] as keyof typeof HorizontalScroll),
         x: e.x,
         y: e.y,
       };
+
     case EventType.EVENT_MOUSE_CLICKED:
     case EventType.EVENT_MOUSE_PRESSED:
     case EventType.EVENT_MOUSE_RELEASED:
@@ -119,12 +115,12 @@ class IOHandle implements HookHandle {
   constructor(
     id: Symbol,
     eventType: string,
-    predicate: (event: GlobalInputEvent) => boolean,
-    handler: (event: GlobalInputEvent) => void,
+    predicate: (e: any) => boolean,
+    handler: (e: any) => void,
     once: boolean
   ) {
-    const fn = (e: UiohookInputEvent) => {
-      const event = prepareEvent(e);
+    const fn = (rawEvent: UiohookInputEvent) => {
+      const event = prepareEvent(rawEvent);
 
       if (predicate(event)) {
         handler(event);
@@ -139,6 +135,10 @@ class IOHandle implements HookHandle {
     this.#eventType = eventType;
     this.#fn = fn;
     this.start();
+
+    this.start = this.start.bind(this);
+    this.stop = this.stop.bind(this);
+    this.toggle = this.toggle.bind(this);
   }
 
   get isActive() {

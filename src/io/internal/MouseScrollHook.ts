@@ -1,15 +1,15 @@
-import { uIOhook, UiohookWheelEvent } from "uiohook-napi";
 import IOHandle from "./IOHandle.js";
 import { GlobalScrollEvent, Hook } from "./types";
 
 class MouseScrollHook implements Hook {
   #id: Symbol;
   #once: boolean = false;
+  #all: boolean = false;
   #alt: boolean = false;
   #ctrl: boolean = false;
   #meta: boolean = false;
   #shift: boolean = false;
-  #rotation: number = 0;
+  #rotation: "LEFT" | "RIGHT" | "UP" | "DOWN" | "ANY" = "ANY";
   #direction: "HORIZONTAL" | "VERTICAL" | "ANY" = "ANY";
 
   constructor() {
@@ -21,13 +21,28 @@ class MouseScrollHook implements Hook {
     return this;
   }
 
+  get all() {
+    this.#all = true;
+    return this;
+  }
+
   get up() {
-    this.#rotation = -1;
+    this.#rotation = "UP";
     return this;
   }
 
   get down() {
-    this.#rotation = 1;
+    this.#rotation = "DOWN";
+    return this;
+  }
+
+  get left() {
+    this.#rotation = "LEFT";
+    return this;
+  }
+
+  get right() {
+    this.#rotation = "RIGHT";
     return this;
   }
 
@@ -63,12 +78,13 @@ class MouseScrollHook implements Hook {
 
   do(handler: (e: GlobalScrollEvent) => void) {
     const predicate = (e: GlobalScrollEvent) =>
-      (this.#rotation === 0 || e.rotation === this.#rotation) &&
+      (this.#rotation === "ANY" || e.rotation === this.#rotation) &&
       (this.#direction === "ANY" || e.direction === this.#direction) &&
-      e.alt === this.#alt &&
-      e.ctrl === this.#ctrl &&
-      e.meta === this.#meta &&
-      e.shift === this.#shift;
+      (this.#all ||
+        (e.alt === this.#alt &&
+          e.ctrl === this.#ctrl &&
+          e.meta === this.#meta &&
+          e.shift === this.#shift));
 
     return new IOHandle(this.#id, "wheel", predicate, handler, this.#once);
   }

@@ -1,20 +1,26 @@
-import { uIOhook, UiohookMouseEvent } from "uiohook-napi";
-import { MainHook } from "./types";
+import IOHandle from "./IOHandle.js";
+import { GlobalMouseEvent, Hook } from "./types";
 
-class MouseMoveHook {
+class MouseMoveHook implements Hook {
+  #id: Symbol;
   #once: boolean = false;
-  #state: MainHook;
+  #all: boolean = false;
   #alt: boolean = false;
   #ctrl: boolean = false;
   #meta: boolean = false;
   #shift: boolean = false;
 
-  constructor(state: MainHook) {
-    this.#state = state;
+  constructor() {
+    this.#id = Symbol();
   }
 
   get once() {
     this.#once = true;
+    return this;
+  }
+
+  get all() {
+    this.#all = true;
     return this;
   }
 
@@ -38,54 +44,15 @@ class MouseMoveHook {
     return this;
   }
 
-  do(handler: (e: UiohookMouseEvent) => void) {
-    let _isActive = true;
+  do(handler: (e: GlobalMouseEvent) => void) {
+    const predicate = (e: GlobalMouseEvent) =>
+      this.#all ||
+      (e.alt === this.#alt &&
+        e.ctrl === this.#ctrl &&
+        e.meta === this.#meta &&
+        e.shift === this.#shift);
 
-    const fn = (e: UiohookMouseEvent) => {
-      if (
-        e.altKey === this.#alt &&
-        e.ctrlKey === this.#ctrl &&
-        e.metaKey === this.#meta &&
-        e.shiftKey === this.#shift
-      ) {
-        handler(e);
-
-        if (this.#once) {
-          uIOhook.off("mousemove", fn);
-          _isActive = false;
-        }
-      }
-    };
-
-    uIOhook.on("mousemove", fn);
-
-    if (!this.#state.isRunning) {
-      uIOhook.start();
-      this.#state.isRunning = true;
-    }
-
-    return {
-      get isActive() {
-        return _isActive;
-      },
-      stop() {
-        if (_isActive) {
-          uIOhook.off("mousemove", fn);
-          _isActive = false;
-        }
-      },
-      start() {
-        if (!this.isActive) {
-          uIOhook.on("mousemove", fn);
-          _isActive = true;
-        }
-      },
-      toggle() {
-        const type = this.isActive ? "off" : "on";
-        uIOhook[type]("mousemove", fn);
-        _isActive = !_isActive;
-      },
-    };
+    return new IOHandle(this.#id, "mousemove", predicate, handler, this.#once);
   }
 }
 

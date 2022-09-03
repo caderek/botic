@@ -7,6 +7,16 @@ export enum MouseButton {
   MIDDLE,
 }
 
+export enum VerticalScroll {
+  UP = -1,
+  DOWN = 1,
+}
+
+export enum HorizontalScroll {
+  LEFT = -1,
+  RIGHT = 1,
+}
+
 export enum KeyboardEventType {
   KEY_PRESSED = 4,
   KEY_RELEASED = 5,
@@ -20,7 +30,7 @@ export enum MouseEventType {
 }
 
 export enum WheelEventType {
-  MOUSE_WHEEL = 11,
+  MOUSE_SCROLL = 11,
 }
 
 export enum InputEventType {
@@ -30,8 +40,10 @@ export enum InputEventType {
   MOUSE_PRESSED = 7,
   MOUSE_RELEASED = 8,
   MOUSE_MOVED = 9,
-  MOUSE_WHEEL = 11,
+  MOUSE_SCROLL = 11,
 }
+
+export const KeycodeByName = UiohookKey;
 
 export const KeysNames = new Map(
   Object.entries(UiohookKey).map(([key, code]) => [code, key])

@@ -1,8 +1,9 @@
 import IOHandle from "./IOHandle.js";
-import { MouseButton } from "./constants.js";
-import { GlobalMouseEvent, Hook } from "./types";
+import { GlobalKeyboardEvent, Hook } from "./types";
 
-class MousePressReleaseHook implements Hook {
+const ANY_KEY = -1;
+
+class KeyPressReleaseHook implements Hook {
   #id: Symbol;
   #once: boolean = false;
   #all: boolean = false;
@@ -10,12 +11,13 @@ class MousePressReleaseHook implements Hook {
   #ctrl: boolean = false;
   #meta: boolean = false;
   #shift: boolean = false;
-  #button: MouseButton = MouseButton.NONE;
-  #variant: "mousedown" | "mouseup";
+  #keycode: number;
+  #variant: "keydown" | "keyup";
 
-  constructor(variant: "mousedown" | "mouseup") {
-    this.#variant = variant;
+  constructor(variant: "keydown" | "keyup", keycode: number = ANY_KEY) {
     this.#id = Symbol();
+    this.#keycode = keycode;
+    this.#variant = variant;
   }
 
   get once() {
@@ -25,21 +27,6 @@ class MousePressReleaseHook implements Hook {
 
   get all() {
     this.#all = true;
-    return this;
-  }
-
-  get left() {
-    this.#button = MouseButton.LEFT;
-    return this;
-  }
-
-  get right() {
-    this.#button = MouseButton.RIGHT;
-    return this;
-  }
-
-  get middle() {
-    this.#button = MouseButton.MIDDLE;
     return this;
   }
 
@@ -63,9 +50,9 @@ class MousePressReleaseHook implements Hook {
     return this;
   }
 
-  do(handler: (e: GlobalMouseEvent) => void) {
-    const predicate = (e: GlobalMouseEvent) =>
-      (this.#button === MouseButton.NONE || e.button === this.#button) &&
+  do(handler: (e: GlobalKeyboardEvent) => void) {
+    const predicate = (e: GlobalKeyboardEvent) =>
+      (this.#keycode === ANY_KEY || e.key === this.#keycode) &&
       (this.#all ||
         (e.alt === this.#alt &&
           e.ctrl === this.#ctrl &&
@@ -82,4 +69,4 @@ class MousePressReleaseHook implements Hook {
   }
 }
 
-export default MousePressReleaseHook;
+export default KeyPressReleaseHook;

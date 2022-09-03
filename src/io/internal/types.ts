@@ -4,6 +4,8 @@ import {
   MouseEventType,
   WheelEventType,
   MouseButton,
+  VerticalScroll,
+  HorizontalScroll,
 } from "./constants.js";
 
 export type GlobalMouseEvent = {
@@ -26,10 +28,12 @@ export type GlobalScrollEvent = {
   meta: boolean;
   shift: boolean;
   direction: keyof typeof WheelDirection;
-  rotation: number;
+  rotation: keyof typeof VerticalScroll | keyof typeof HorizontalScroll;
   x: number;
   y: number;
 };
+
+export type KeyName = keyof typeof UiohookKey;
 
 export type GlobalKeyboardEvent = {
   type: keyof typeof KeyboardEventType;
@@ -38,7 +42,7 @@ export type GlobalKeyboardEvent = {
   meta: boolean;
   shift: boolean;
   key: number;
-  keyName: keyof typeof UiohookKey | "OTHER";
+  keyName: KeyName | "OTHER";
 };
 
 export type GlobalInputEvent =
