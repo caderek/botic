@@ -1,21 +1,22 @@
-import IOHandle from "./IOHandle.js";
-import { MouseButton } from "./constants.js";
-import { GlobalMouseEvent, Hook } from "./types";
+import IOHandle from "../handles/IOHandle.js";
+import { MouseButton } from "../../constants.js";
+import { GlobalMouseEvent, Hook } from "../../types";
 
-class MousePressReleaseHook implements Hook {
+class MouseClickHook implements Hook {
   #id: Symbol;
   #once: boolean = false;
   #all: boolean = false;
+  #mod: boolean = false;
+  #clicks: number = 1;
+  #button: MouseButton;
   #alt: boolean = false;
   #ctrl: boolean = false;
   #meta: boolean = false;
   #shift: boolean = false;
-  #button: MouseButton = MouseButton.NONE;
-  #variant: "mousedown" | "mouseup";
 
-  constructor(variant: "mousedown" | "mouseup") {
-    this.#variant = variant;
+  constructor(button: MouseButton) {
     this.#id = Symbol();
+    this.#button = button;
   }
 
   get once() {
@@ -28,18 +29,13 @@ class MousePressReleaseHook implements Hook {
     return this;
   }
 
-  get left() {
-    this.#button = MouseButton.LEFT;
+  get double() {
+    this.#clicks = 2;
     return this;
   }
 
-  get right() {
-    this.#button = MouseButton.RIGHT;
-    return this;
-  }
-
-  get middle() {
-    this.#button = MouseButton.MIDDLE;
+  get triple() {
+    this.#clicks = 3;
     return this;
   }
 
@@ -58,6 +54,11 @@ class MousePressReleaseHook implements Hook {
     return this;
   }
 
+  get mod() {
+    this.#mod = true;
+    return this;
+  }
+
   get shift() {
     this.#shift = true;
     return this;
@@ -65,21 +66,16 @@ class MousePressReleaseHook implements Hook {
 
   do(handler: (e: GlobalMouseEvent) => void) {
     const predicate = (e: GlobalMouseEvent) =>
-      (this.#button === MouseButton.NONE || e.button === this.#button) &&
+      (this.#button === MouseButton.ANY || e.button === this.#button) &&
+      (this.#clicks === 1 || e.clicks === this.#clicks) &&
       (this.#all ||
         (e.alt === this.#alt &&
           e.ctrl === this.#ctrl &&
           e.meta === this.#meta &&
           e.shift === this.#shift));
 
-    return new IOHandle(
-      this.#id,
-      this.#variant,
-      predicate,
-      handler,
-      this.#once
-    );
+    return new IOHandle(this.#id, "click", predicate, handler, this.#once);
   }
 }
 
-export default MousePressReleaseHook;
+export default MouseClickHook;

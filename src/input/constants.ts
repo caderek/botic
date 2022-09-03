@@ -1,6 +1,7 @@
 import { UiohookKey } from "uiohook-napi";
 
 export enum MouseButton {
+  ANY = -1,
   NONE,
   LEFT,
   RIGHT,

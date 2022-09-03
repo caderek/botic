@@ -1,20 +1,22 @@
-import IOHandle from "./IOHandle.js";
-import { GlobalMouseEvent, Hook } from "./types";
-import { MouseButton } from "./constants.js";
+import IOHandle from "../handles/IOHandle.js";
+import { MouseButton } from "../../constants.js";
+import { GlobalMouseEvent, Hook } from "../../types";
 
-class MouseClickHook implements Hook {
+class MousePressReleaseHook implements Hook {
   #id: Symbol;
   #once: boolean = false;
   #all: boolean = false;
-  #clicks: number = 1;
-  #button: MouseButton = MouseButton.NONE;
   #alt: boolean = false;
   #ctrl: boolean = false;
   #meta: boolean = false;
   #shift: boolean = false;
+  #button: MouseButton;
+  #variant: "mousedown" | "mouseup";
 
-  constructor() {
+  constructor(variant: "mousedown" | "mouseup", button: MouseButton) {
+    this.#variant = variant;
     this.#id = Symbol();
+    this.#button = button;
   }
 
   get once() {
@@ -24,31 +26,6 @@ class MouseClickHook implements Hook {
 
   get all() {
     this.#all = true;
-    return this;
-  }
-
-  get double() {
-    this.#clicks = 2;
-    return this;
-  }
-
-  get triple() {
-    this.#clicks = 3;
-    return this;
-  }
-
-  get left() {
-    this.#button = MouseButton.LEFT;
-    return this;
-  }
-
-  get right() {
-    this.#button = MouseButton.RIGHT;
-    return this;
-  }
-
-  get middle() {
-    this.#button = MouseButton.MIDDLE;
     return this;
   }
 
@@ -75,15 +52,20 @@ class MouseClickHook implements Hook {
   do(handler: (e: GlobalMouseEvent) => void) {
     const predicate = (e: GlobalMouseEvent) =>
       (this.#button === MouseButton.NONE || e.button === this.#button) &&
-      (this.#clicks === 1 || e.clicks === this.#clicks) &&
       (this.#all ||
         (e.alt === this.#alt &&
           e.ctrl === this.#ctrl &&
           e.meta === this.#meta &&
           e.shift === this.#shift));
 
-    return new IOHandle(this.#id, "click", predicate, handler, this.#once);
+    return new IOHandle(
+      this.#id,
+      this.#variant,
+      predicate,
+      handler,
+      this.#once
+    );
   }
 }
 
-export default MouseClickHook;
+export default MousePressReleaseHook;

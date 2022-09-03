@@ -1,9 +1,10 @@
-import IOHandle from "./IOHandle.js";
-import { Hook, GlobalInputEvent } from "./types";
+import IOHandle from "../handles/IOHandle.js";
+import { GlobalMouseEvent, Hook } from "../../types";
 
-class UniversalHook implements Hook {
+class MouseMoveHook implements Hook {
   #id: Symbol;
   #once: boolean = false;
+  #all: boolean = false;
   #alt: boolean = false;
   #ctrl: boolean = false;
   #meta: boolean = false;
@@ -15,6 +16,11 @@ class UniversalHook implements Hook {
 
   get once() {
     this.#once = true;
+    return this;
+  }
+
+  get all() {
+    this.#all = true;
     return this;
   }
 
@@ -38,16 +44,16 @@ class UniversalHook implements Hook {
     return this;
   }
 
-  do(handler: (e: GlobalInputEvent) => void) {
-    const predicate = (e: GlobalInputEvent) =>
-      (!this.#alt && !this.#ctrl && !this.#meta && !this.#shift) ||
+  do(handler: (e: GlobalMouseEvent) => void) {
+    const predicate = (e: GlobalMouseEvent) =>
+      this.#all ||
       (e.alt === this.#alt &&
         e.ctrl === this.#ctrl &&
         e.meta === this.#meta &&
         e.shift === this.#shift);
 
-    return new IOHandle(this.#id, "input", predicate, handler, this.#once);
+    return new IOHandle(this.#id, "mousemove", predicate, handler, this.#once);
   }
 }
 
-export default UniversalHook;
+export default MouseMoveHook;

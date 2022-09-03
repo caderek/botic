@@ -1,5 +1,5 @@
-import IOHandle from "./IOHandle.js";
-import { GlobalKeyboardEvent, Hook } from "./types";
+import IOHandle from "../handles/IOHandle.js";
+import { GlobalKeyboardEvent, Hook } from "../../types";
 
 const ANY_KEY = -1;
 

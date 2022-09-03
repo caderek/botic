@@ -1,5 +1,5 @@
-import IOHandle from "./IOHandle.js";
-import { GlobalScrollEvent, Hook } from "./types";
+import IOHandle from "../handles/IOHandle.js";
+import { GlobalScrollEvent, Hook } from "../../types";
 
 class MouseScrollHook implements Hook {
   #id: Symbol;

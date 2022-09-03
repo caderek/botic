@@ -61,9 +61,5 @@ export interface HookHandle {
 
 export interface Hook {
   readonly once: Hook;
-  readonly alt: Hook;
-  readonly ctrl: Hook;
-  readonly meta: Hook;
-  readonly shift: Hook;
   do(handler: HookHandler): HookHandle;
 }

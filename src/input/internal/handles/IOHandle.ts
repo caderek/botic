@@ -15,9 +15,9 @@ import {
   KeysNames,
   VerticalScroll,
   HorizontalScroll,
-} from "./constants.js";
+} from "../../constants.js";
 
-import { HookHandle, GlobalInputEvent } from "./types";
+import { HookHandle, GlobalInputEvent } from "../../types";
 
 type UiohookInputEvent =
   | UiohookMouseEvent
