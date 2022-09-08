@@ -6,7 +6,6 @@ class MouseClickHook implements Hook {
   #id: Symbol;
   #once: boolean = false;
   #all: boolean = false;
-  #mod: boolean = false;
   #clicks: number = 1;
   #button: MouseButton;
   #alt: boolean = false;
@@ -51,11 +50,6 @@ class MouseClickHook implements Hook {
 
   get meta() {
     this.#meta = true;
-    return this;
-  }
-
-  get mod() {
-    this.#mod = true;
     return this;
   }
 
