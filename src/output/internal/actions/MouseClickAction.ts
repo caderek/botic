@@ -1,33 +1,19 @@
-import {
-  mouse,
-  keyboard,
-  Key,
-  Button,
-  down,
-  Point as NutPoint,
-} from "@nut-tree/nut-js";
+import { mouse, Button } from "@nut-tree/nut-js";
 import { getType, types } from "@arrows/dispatch";
+import wrapWithModifiers from "../helpers/wrapWithModifiers.js";
 
-interface Point {
-  x: number;
-  y: number;
-}
+import { Point } from "../../types";
 
-class MouseAction {
+class MouseClickAction {
   #clicks: number = 1;
   #button: Button;
-  #action: "click" | "pressButton" | "releaseButton";
   #alt: boolean = false;
   #ctrl: boolean = false;
   #meta: boolean = false;
   #shift: boolean = false;
 
-  constructor(
-    button: Button,
-    action: "click" | "pressButton" | "releaseButton"
-  ) {
+  constructor(button: Button) {
     this.#button = button;
-    this.#action = action;
   }
 
   get double() {
@@ -64,29 +50,18 @@ class MouseAction {
   async #exec(point: Point): Promise<void>;
   async #exec(...args: any[]) {
     if (getType(args[0]) === types.Object) {
-      const { x, y } = args[0] as { x: number; y: number };
-      await mouse.setPosition(new NutPoint(x, y));
+      const point = args[0] as { x: number; y: number };
+      await mouse.setPosition(point);
     } else if (args[0] !== undefined && args[1] !== undefined) {
       const [x, y] = args as number[];
-      await mouse.setPosition(new NutPoint(x, y));
+      await mouse.setPosition({ x, y });
     }
 
-    const modifiers = [
-      ...(this.#alt ? [Key.LeftAlt] : []),
-      ...(this.#ctrl ? [Key.LeftControl] : []),
-      ...(this.#meta ? [Key.LeftSuper] : []),
-      ...(this.#shift ? [Key.LeftShift] : []),
-    ];
-
-    if (modifiers.length > 0) {
-      await keyboard.pressKey(...modifiers);
-    }
-
-    await mouse[this.#action](this.#button);
-
-    if (modifiers.length > 0) {
-      await keyboard.releaseKey(...modifiers);
-    }
+    await wrapWithModifiers(async () => {
+      while (this.#clicks--) {
+        await mouse.click(this.#button);
+      }
+    }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
   async at(x: number, y: number): Promise<void>;
@@ -100,8 +75,4 @@ class MouseAction {
   }
 }
 
-export default MouseAction;
-
-const x = new MouseAction(Button.LEFT, "click").at({ x: 1, y: 2 });
-
-new MouseAction(Button.LEFT, "click").at(2);
+export default MouseClickAction;

@@ -3,14 +3,16 @@ import { Key, keyboard } from "@nut-tree/nut-js";
 import $ from "../index.js";
 import activeWin from "active-win";
 
-$.listen.any.do((event) => {
-  // @ts-ignore
-  if (event.type !== "KEY_PRESSED" && event.keyName === "Z") {
-    process.exit();
-  }
-  console.log(event);
-  // logUpdate(JSON.stringify(event, null, 2));
-});
+// $.listen.any.do((event) => {
+//   if (event.type === "KEY_PRESSED" && event.keyName === "Z") {
+//     process.exit();
+//   }
+
+//   if (event.type === "MOUSE_CLICKED" || event.type === "MOUSE_SCROLL") {
+//     console.log(event);
+//   }
+//   // logUpdate(JSON.stringify(event, null, 2));
+// });
 
 // const w = await screen.width();
 // const h = await screen.height();
@@ -54,4 +56,14 @@ $.listen.any.do((event) => {
 
 // $.send.mouse.click.left.at(0, 0);
 
-$.send.mouse.click.left.at(10, 10);
+// await $.mouse.goto(2400, 900);
+// await $.mouse.click.left.double.ctrl.alt.here();
+
+// await $.mouse.scroll.down.ctrl.many(5);
+
+// console.log(await $.mouse.position);
+
+// await $.mouse.goto({ x: 1, y: 3 });
+
+await $.mouse.move.to(1920, 0);
+await $.mouse.move.to({ x: 1920 * 2, y: 1080 });
