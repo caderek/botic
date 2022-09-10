@@ -1,4 +1,12 @@
-import { mouse, left, right, up, down, straightTo } from "@nut-tree/nut-js";
+import {
+  mouse,
+  left,
+  right,
+  up,
+  down,
+  straightTo,
+  Button,
+} from "@nut-tree/nut-js";
 import toPoint from "../helpers/toPoint.js";
 import wrapWithModifiers from "../helpers/wrapWithModifiers.js";
 import toCenterPoint from "../helpers/toCenterPoint.js";
@@ -6,7 +14,8 @@ import toRandomPoint from "../helpers/toRandomPoint.js";
 
 import { Point, Region } from "../../types";
 
-class MouseMoveAction {
+class MouseDragAction {
+  #button: Button;
   #alt: boolean = false;
   #ctrl: boolean = false;
   #meta: boolean = false;
@@ -15,7 +24,9 @@ class MouseMoveAction {
   #delay: number = 0;
   #from?: Point;
 
-  constructor() {}
+  constructor(button: Button) {
+    this.#button = button;
+  }
 
   delay(ms: number) {
     this.#delay = ms;
@@ -67,8 +78,8 @@ class MouseMoveAction {
     return this;
   }
 
-  from(point: Point): MouseMoveAction;
-  from(x: number, y: number): MouseMoveAction;
+  from(point: Point): MouseDragAction;
+  from(x: number, y: number): MouseDragAction;
   from(...args: any[]) {
     this.#from = toPoint(args);
     return this;
@@ -86,7 +97,9 @@ class MouseMoveAction {
         await mouse.setPosition(this.#from);
       }
 
+      await mouse.pressButton(this.#button);
       await mouse.move(straightTo(point));
+      await mouse.releaseButton(this.#button);
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
@@ -97,37 +110,49 @@ class MouseMoveAction {
 
   async horizontal(pixelsX: number) {
     await wrapWithModifiers(async () => {
+      await mouse.pressButton(this.#button);
       await mouse.move(right(pixelsX));
+      await mouse.releaseButton(this.#button);
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
   async vertical(pixelsY: number) {
     await wrapWithModifiers(async () => {
+      await mouse.pressButton(this.#button);
       await mouse.move(down(pixelsY));
+      await mouse.releaseButton(this.#button);
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
   async left(pixels: number) {
     await wrapWithModifiers(async () => {
+      await mouse.pressButton(this.#button);
       await mouse.move(left(Math.abs(pixels)));
+      await mouse.releaseButton(this.#button);
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
   async right(pixels: number) {
     await wrapWithModifiers(async () => {
+      await mouse.pressButton(this.#button);
       await mouse.move(right(Math.abs(pixels)));
+      await mouse.releaseButton(this.#button);
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
   async up(pixels: number) {
     await wrapWithModifiers(async () => {
+      await mouse.pressButton(this.#button);
       await mouse.move(up(Math.abs(pixels)));
+      await mouse.releaseButton(this.#button);
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
   async down(pixels: number) {
     await wrapWithModifiers(async () => {
+      await mouse.pressButton(this.#button);
       await mouse.move(down(Math.abs(pixels)));
+      await mouse.releaseButton(this.#button);
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
@@ -146,4 +171,4 @@ class MouseMoveAction {
   }
 }
 
-export default MouseMoveAction;
+export default MouseDragAction;

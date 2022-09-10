@@ -3,6 +3,7 @@ import MouseClickAction from "./internal/actions/MouseClickAction.js";
 import MousePressReleaseAction from "./internal/actions/MousePressReleaseAction.js";
 import MouseScrollAction from "./internal/actions/MouseScrollAction.js";
 import MouseMoveAction from "./internal/actions/MouseMoveAction.js";
+import MouseDragAction from "./internal/actions/MouseDragAction.js";
 import goto from "./internal/actions/goto.js";
 
 import { Point } from "./types";
@@ -12,15 +13,15 @@ const mouse = {
   /** Uses mouse click. */
   click: {
     /** Uses left mouse button. */
-    get left() {
+    get Left() {
       return new MouseClickAction(Button.LEFT);
     },
     /** Uses right mouse button. */
-    get right() {
+    get Right() {
       return new MouseClickAction(Button.RIGHT);
     },
     /** Uses middle mouse button. */
-    get middle() {
+    get Middle() {
       return new MouseClickAction(Button.MIDDLE);
     },
   },
@@ -28,15 +29,15 @@ const mouse = {
   /** Uses pressing of the mouse button. */
   press: {
     /** Uses left mouse button. */
-    get left() {
+    get Left() {
       return new MousePressReleaseAction(Button.LEFT, "pressButton");
     },
     /** Uses right mouse button. */
-    get right() {
+    get Right() {
       return new MousePressReleaseAction(Button.RIGHT, "pressButton");
     },
     /** Uses middle mouse button. */
-    get middle() {
+    get Middle() {
       return new MousePressReleaseAction(Button.MIDDLE, "pressButton");
     },
   },
@@ -44,15 +45,15 @@ const mouse = {
   /** Uses releasing of the mouse button. */
   release: {
     /** Uses left mouse button. */
-    get left() {
+    get Left() {
       return new MousePressReleaseAction(Button.LEFT, "releaseButton");
     },
     /** Uses right mouse button. */
-    get right() {
+    get Right() {
       return new MousePressReleaseAction(Button.RIGHT, "releaseButton");
     },
     /** Uses middle mouse button. */
-    get middle() {
+    get Middle() {
       return new MousePressReleaseAction(Button.MIDDLE, "releaseButton");
     },
   },
@@ -83,6 +84,27 @@ const mouse = {
   /** Moves the mouse. */
   get move() {
     return new MouseMoveAction();
+  },
+
+  // /** Drags the mouse holding the left button. */
+  // get drag() {
+  //   return new MouseMoveDragAction("drag");
+  // },
+
+  /** Uses mouse click. */
+  drag: {
+    /** Uses left mouse button. */
+    get Left() {
+      return new MouseDragAction(Button.LEFT);
+    },
+    /** Uses right mouse button. */
+    get Right() {
+      return new MouseDragAction(Button.RIGHT);
+    },
+    /** Uses middle mouse button. */
+    get Middle() {
+      return new MouseDragAction(Button.MIDDLE);
+    },
   },
 };
 

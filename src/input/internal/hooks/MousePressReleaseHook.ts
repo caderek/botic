@@ -29,22 +29,22 @@ class MousePressReleaseHook implements Hook {
     return this;
   }
 
-  get alt() {
+  get Alt() {
     this.#alt = true;
     return this;
   }
 
-  get ctrl() {
+  get Ctrl() {
     this.#ctrl = true;
     return this;
   }
 
-  get meta() {
+  get Meta() {
     this.#meta = true;
     return this;
   }
 
-  get shift() {
+  get Shift() {
     this.#shift = true;
     return this;
   }

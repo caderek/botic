@@ -1,8 +1,9 @@
 import { mouse, Button } from "@nut-tree/nut-js";
 import { getType, types } from "@arrows/dispatch";
 import wrapWithModifiers from "../helpers/wrapWithModifiers.js";
+import toCenterPoint from "../helpers/toCenterPoint.js";
 
-import { Point } from "../../types";
+import { Point, Region } from "../../types";
 
 class MouseClickAction {
   #clicks: number = 1;
@@ -26,22 +27,22 @@ class MouseClickAction {
     return this;
   }
 
-  get alt() {
+  get Alt() {
     this.#alt = true;
     return this;
   }
 
-  get ctrl() {
+  get Ctrl() {
     this.#ctrl = true;
     return this;
   }
 
-  get meta() {
+  get Meta() {
     this.#meta = true;
     return this;
   }
 
-  get shift() {
+  get Shift() {
     this.#shift = true;
     return this;
   }
@@ -72,6 +73,13 @@ class MouseClickAction {
 
   async here() {
     await this.#exec();
+  }
+
+  async center(region?: Region): Promise<void>;
+  async center(region: { region: Region }): Promise<void>;
+  async center(arg?: any) {
+    const point = await toCenterPoint(arg);
+    await this.#exec(point);
   }
 }
 

@@ -1,13 +1,9 @@
-import {
-  mouse,
-  keyboard,
-  Key,
-  Button,
-  Point as NutPoint,
-} from "@nut-tree/nut-js";
+import { mouse, Button, Point as NutPoint } from "@nut-tree/nut-js";
 import { getType, types } from "@arrows/dispatch";
+import toCenterPoint from "../helpers/toCenterPoint.js";
 
-import { Point } from "../../types";
+import { Point, Region } from "../../types";
+import wrapWithModifiers from "../helpers/wrapWithModifiers.js";
 
 type Action = "pressButton" | "releaseButton";
 
@@ -24,22 +20,22 @@ class MousePressReleaseAction {
     this.#action = action;
   }
 
-  get alt() {
+  get Alt() {
     this.#alt = true;
     return this;
   }
 
-  get ctrl() {
+  get Ctrl() {
     this.#ctrl = true;
     return this;
   }
 
-  get meta() {
+  get Meta() {
     this.#meta = true;
     return this;
   }
 
-  get shift() {
+  get Shift() {
     this.#shift = true;
     return this;
   }
@@ -55,22 +51,9 @@ class MousePressReleaseAction {
       await mouse.setPosition(new NutPoint(x, y));
     }
 
-    const modifiers = [
-      ...(this.#alt ? [Key.LeftAlt] : []),
-      ...(this.#ctrl ? [Key.LeftControl] : []),
-      ...(this.#meta ? [Key.LeftSuper] : []),
-      ...(this.#shift ? [Key.LeftShift] : []),
-    ];
-
-    if (modifiers.length > 0) {
-      await keyboard.pressKey(...modifiers);
-    }
-
-    await mouse[this.#action](this.#button);
-
-    if (modifiers.length > 0) {
-      await keyboard.releaseKey(...modifiers);
-    }
+    await wrapWithModifiers(async () => {
+      await mouse[this.#action](this.#button);
+    }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
   async at(x: number, y: number): Promise<void>;
@@ -81,6 +64,13 @@ class MousePressReleaseAction {
 
   async here() {
     await this.#exec();
+  }
+
+  async center(region?: Region): Promise<void>;
+  async center(region: { region: Region }): Promise<void>;
+  async center(arg?: any) {
+    const point = await toCenterPoint(arg);
+    await this.#exec(point);
   }
 }
 
