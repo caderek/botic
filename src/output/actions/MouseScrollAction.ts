@@ -1,4 +1,4 @@
-import { mouse, keyboard, Key, Point as NutPoint } from "@nut-tree/nut-js";
+import { mouse, keyboard, Key } from "@nut-tree/nut-js";
 
 type Action = "scrollDown" | "scrollUp" | "scrollLeft" | "scrollRight";
 

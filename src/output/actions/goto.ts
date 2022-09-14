@@ -1,6 +1,6 @@
 import { getType, types } from "@arrows/dispatch";
 import { mouse } from "@nut-tree/nut-js";
-import { Point } from "../../types";
+import { Point } from "../../common/types";
 
 async function goto(point: Point): Promise<void>;
 async function goto(x: number, y: number): Promise<void>;

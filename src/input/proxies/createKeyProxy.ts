@@ -1,8 +1,8 @@
 import KeyPressReleaseHook from "../hooks/KeyPressReleaseHook.js";
-import getKeyError from "../errors/getKeyError.js";
+import getKeyError from "../../common/errors/getKeyError.js";
 
-import { KeycodeByName } from "../../constants.js";
-import { KeyName } from "../../types";
+import { KeycodeByName } from "../../common/constants.js";
+import { KeyName } from "../../common/types";
 
 /**
  * Creates proxy object with properties as:

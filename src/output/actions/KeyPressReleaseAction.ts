@@ -1,30 +1,23 @@
-import { mouse, Button } from "@nut-tree/nut-js";
+import { keyboard, mouse, Button, Point as NutPoint } from "@nut-tree/nut-js";
 import { getType, types } from "@arrows/dispatch";
-import wrapWithModifiers from "../helpers/wrapWithModifiers.js";
 import toCenterPoint from "../helpers/toCenterPoint.js";
 
-import { Point, Region } from "../../types";
+import { Point, Region } from "../../../common/types";
+import wrapWithModifiers from "../helpers/wrapWithModifiers.js";
 
-class MouseClickAction {
-  #clicks: number = 1;
+type Action = "pressKey" | "releaseKey";
+
+class KeyPressReleaseAction {
   #button: Button;
+  #action: Action;
   #alt: boolean = false;
   #ctrl: boolean = false;
   #meta: boolean = false;
   #shift: boolean = false;
 
-  constructor(button: Button) {
+  constructor(button: Button, action: Action) {
     this.#button = button;
-  }
-
-  get double() {
-    this.#clicks = 2;
-    return this;
-  }
-
-  get triple() {
-    this.#clicks = 3;
-    return this;
+    this.#action = action;
   }
 
   get Alt() {
@@ -51,17 +44,15 @@ class MouseClickAction {
   async #exec(point: Point): Promise<void>;
   async #exec(...args: any[]) {
     if (getType(args[0]) === types.Object) {
-      const point = args[0] as { x: number; y: number };
-      await mouse.setPosition(point);
+      const { x, y } = args[0] as { x: number; y: number };
+      await mouse.setPosition(new NutPoint(x, y));
     } else if (args[0] !== undefined && args[1] !== undefined) {
       const [x, y] = args as number[];
-      await mouse.setPosition({ x, y });
+      await mouse.setPosition(new NutPoint(x, y));
     }
 
     await wrapWithModifiers(async () => {
-      while (this.#clicks--) {
-        await mouse.click(this.#button);
-      }
+      await mouse[this.#action](this.#button);
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
@@ -83,4 +74,4 @@ class MouseClickAction {
   }
 }
 
-export default MouseClickAction;
+export default KeyPressReleaseAction;

@@ -1,20 +1,19 @@
 import IOHandle from "../handles/IOHandle.js";
-import { MouseButton } from "../../constants.js";
-import { GlobalMouseEvent, Hook } from "../../types";
+import { MouseButton } from "../../common/constants.js";
+import { GlobalMouseEvent, Hook } from "../../common/types";
 
-class MousePressReleaseHook implements Hook {
+class MouseClickHook implements Hook {
   #id: Symbol;
   #once: boolean = false;
   #all: boolean = false;
+  #clicks: number = 1;
+  #button: MouseButton;
   #alt: boolean = false;
   #ctrl: boolean = false;
   #meta: boolean = false;
   #shift: boolean = false;
-  #button: MouseButton;
-  #variant: "mousedown" | "mouseup";
 
-  constructor(variant: "mousedown" | "mouseup", button: MouseButton) {
-    this.#variant = variant;
+  constructor(button: MouseButton) {
     this.#id = Symbol();
     this.#button = button;
   }
@@ -26,6 +25,16 @@ class MousePressReleaseHook implements Hook {
 
   get all() {
     this.#all = true;
+    return this;
+  }
+
+  get double() {
+    this.#clicks = 2;
+    return this;
+  }
+
+  get triple() {
+    this.#clicks = 3;
     return this;
   }
 
@@ -51,21 +60,16 @@ class MousePressReleaseHook implements Hook {
 
   do(handler: (e: GlobalMouseEvent) => void) {
     const predicate = (e: GlobalMouseEvent) =>
-      (this.#button === MouseButton.NONE || e.button === this.#button) &&
+      (this.#button === MouseButton.ANY || e.button === this.#button) &&
+      (this.#clicks === 1 || e.clicks === this.#clicks) &&
       (this.#all ||
         (e.alt === this.#alt &&
           e.ctrl === this.#ctrl &&
           e.meta === this.#meta &&
           e.shift === this.#shift));
 
-    return new IOHandle(
-      this.#id,
-      this.#variant,
-      predicate,
-      handler,
-      this.#once
-    );
+    return new IOHandle(this.#id, "click", predicate, handler, this.#once);
   }
 }
 
-export default MousePressReleaseHook;
+export default MouseClickHook;

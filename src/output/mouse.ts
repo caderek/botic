@@ -1,12 +1,12 @@
 import { mouse as rawMouse, Button } from "@nut-tree/nut-js";
-import MouseClickAction from "./internal/actions/MouseClickAction.js";
-import MousePressReleaseAction from "./internal/actions/MousePressReleaseAction.js";
-import MouseScrollAction from "./internal/actions/MouseScrollAction.js";
-import MouseMoveAction from "./internal/actions/MouseMoveAction.js";
-import MouseDragAction from "./internal/actions/MouseDragAction.js";
-import goto from "./internal/actions/goto.js";
+import MouseClickAction from "./actions/MouseClickAction.js";
+import MousePressReleaseAction from "./actions/MousePressReleaseAction.js";
+import MouseScrollAction from "./actions/MouseScrollAction.js";
+import MouseMoveAction from "./actions/MouseMoveAction.js";
+import MouseDragAction from "./actions/MouseDragAction.js";
+import goto from "./actions/goto.js";
 
-import { Point } from "./types";
+import { Point } from "../common/types";
 
 /** Sends global mouse events. */
 const mouse = {

@@ -1,11 +1,11 @@
-import UniversalHook from "./internal/hooks/UniversalHook.js";
-import MouseClickHook from "./internal/hooks/MouseClickHook.js";
-import MouseMoveHook from "./internal/hooks/MouseMoveHook.js";
-import MousePressReleaseHook from "./internal/hooks/MousePressReleaseHook.js";
-import MouseScrollHook from "./internal/hooks/MouseScrollHook.js";
-import createKeyProxy from "./internal/proxies/createKeyProxy.js";
+import UniversalHook from "./hooks/UniversalHook.js";
+import MouseClickHook from "./hooks/MouseClickHook.js";
+import MouseMoveHook from "./hooks/MouseMoveHook.js";
+import MousePressReleaseHook from "./hooks/MousePressReleaseHook.js";
+import MouseScrollHook from "./hooks/MouseScrollHook.js";
+import createKeyProxy from "./proxies/createKeyProxy.js";
 
-import { MouseButton } from "./constants.js";
+import { MouseButton } from "../common/constants.js";
 
 /** Listens for global input events. */
 const listen = {

@@ -1,5 +1,5 @@
 import IOHandle from "../handles/IOHandle.js";
-import { Hook, GlobalInputEvent } from "../../types";
+import { Hook, GlobalInputEvent } from "../../common/types";
 
 class UniversalHook implements Hook {
   #id: Symbol;

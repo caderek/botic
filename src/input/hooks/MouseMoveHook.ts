@@ -1,5 +1,5 @@
 import IOHandle from "../handles/IOHandle.js";
-import { GlobalMouseEvent, Hook } from "../../types";
+import { GlobalMouseEvent, Hook } from "../../common/types";
 
 class MouseMoveHook implements Hook {
   #id: Symbol;
