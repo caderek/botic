@@ -1,4 +1,4 @@
-import KeyPressReleaseHook from "../actions/KeyPressReleaseAction.js";
+import KeyTapAction from "../actions/KeyTapAction.js";
 import getKeyError from "../../common/errors/getKeyError.js";
 
 import { KeycodeByName } from "../../common/constants.js";
@@ -12,17 +12,13 @@ import { KeyName } from "../../common/types";
  *
  * @returns Instance of key hook
  */
-const createKeyProxy = (type: "keydown" | "keyup") => {
+const createKeyPressReleaseProxy = () => {
   return new Proxy(
     {},
     {
       get(_, prop) {
         if (prop === "code") {
-          return (keycode: number) => new KeyPressReleaseHook(type, keycode);
-        }
-
-        if (prop === "any") {
-          return new KeyPressReleaseHook(type);
+          return (keycode: number) => new KeyTapAction(keycode);
         }
 
         if (!KeycodeByName.hasOwnProperty(prop)) {
@@ -30,13 +26,12 @@ const createKeyProxy = (type: "keydown" | "keyup") => {
         }
 
         let keycode: number = KeycodeByName[prop as KeyName];
-        return new KeyPressReleaseHook(type, keycode);
+        return new KeyTapAction(keycode);
       },
     }
-  ) as Record<KeyName, KeyPressReleaseHook> & {
-    any: KeyPressReleaseHook;
-    code(keycode: number): KeyPressReleaseHook;
+  ) as Record<KeyName, KeyTapAction> & {
+    code(keycode: number): KeyTapAction;
   };
 };
 
-export default createKeyProxy;
+export default createKeyPressReleaseProxy;

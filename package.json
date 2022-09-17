@@ -29,6 +29,7 @@
     "@nut-tree/nut-js": "^2.2.0",
     "@nut-tree/template-matcher": "^1.0.1",
     "active-win": "^7.7.2",
+    "clipboardy": "^3.0.0",
     "log-update": "^5.0.1",
     "uiohook-napi": "^1.4.0"
   }

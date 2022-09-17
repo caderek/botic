@@ -30,15 +30,15 @@ const mouse = {
   press: {
     /** Uses left mouse button. */
     get Left() {
-      return new MousePressReleaseAction(Button.LEFT, "pressButton");
+      return new MousePressReleaseAction("pressButton", Button.LEFT);
     },
     /** Uses right mouse button. */
     get Right() {
-      return new MousePressReleaseAction(Button.RIGHT, "pressButton");
+      return new MousePressReleaseAction("pressButton", Button.RIGHT);
     },
     /** Uses middle mouse button. */
     get Middle() {
-      return new MousePressReleaseAction(Button.MIDDLE, "pressButton");
+      return new MousePressReleaseAction("pressButton", Button.MIDDLE);
     },
   },
 
@@ -46,15 +46,15 @@ const mouse = {
   release: {
     /** Uses left mouse button. */
     get Left() {
-      return new MousePressReleaseAction(Button.LEFT, "releaseButton");
+      return new MousePressReleaseAction("releaseButton", Button.LEFT);
     },
     /** Uses right mouse button. */
     get Right() {
-      return new MousePressReleaseAction(Button.RIGHT, "releaseButton");
+      return new MousePressReleaseAction("releaseButton", Button.RIGHT);
     },
     /** Uses middle mouse button. */
     get Middle() {
-      return new MousePressReleaseAction(Button.MIDDLE, "releaseButton");
+      return new MousePressReleaseAction("releaseButton", Button.MIDDLE);
     },
   },
 

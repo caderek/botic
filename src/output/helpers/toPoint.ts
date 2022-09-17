@@ -1,5 +1,5 @@
 import { getType, types } from "@arrows/dispatch";
-import { Point } from "../../types";
+import { Point } from "../../common/types";
 
 function toPoint(point: [Point]): Point;
 function toPoint(point: number[]): Point;

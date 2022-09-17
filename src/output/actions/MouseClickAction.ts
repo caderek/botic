@@ -3,7 +3,7 @@ import { getType, types } from "@arrows/dispatch";
 import wrapWithModifiers from "../helpers/wrapWithModifiers.js";
 import toCenterPoint from "../helpers/toCenterPoint.js";
 
-import { Point, Region } from "../../../common/types";
+import { Point, Region } from "../../common/types";
 
 class MouseClickAction {
   #clicks: number = 1;

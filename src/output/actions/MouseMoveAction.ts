@@ -4,7 +4,7 @@ import wrapWithModifiers from "../helpers/wrapWithModifiers.js";
 import toCenterPoint from "../helpers/toCenterPoint.js";
 import toRandomPoint from "../helpers/toRandomPoint.js";
 
-import { Point, Region } from "../../../common/types";
+import { Point, Region } from "../../common/types";
 
 class MouseMoveAction {
   #alt: boolean = false;

@@ -2,20 +2,20 @@ import { mouse, Button, Point as NutPoint } from "@nut-tree/nut-js";
 import { getType, types } from "@arrows/dispatch";
 import toCenterPoint from "../helpers/toCenterPoint.js";
 
-import { Point, Region } from "../../../common/types";
+import { Point, Region } from "../../common/types";
 import wrapWithModifiers from "../helpers/wrapWithModifiers.js";
 
-type Action = "pressButton" | "releaseButton";
+type Variant = "pressButton" | "releaseButton";
 
 class MousePressReleaseAction {
   #button: Button;
-  #action: Action;
+  #action: Variant;
   #alt: boolean = false;
   #ctrl: boolean = false;
   #meta: boolean = false;
   #shift: boolean = false;
 
-  constructor(button: Button, action: Action) {
+  constructor(action: Variant, button: Button) {
     this.#button = button;
     this.#action = action;
   }

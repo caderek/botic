@@ -1,22 +1,17 @@
-import { keyboard, mouse, Button, Point as NutPoint } from "@nut-tree/nut-js";
-import { getType, types } from "@arrows/dispatch";
-import toCenterPoint from "../helpers/toCenterPoint.js";
+import { uIOhook, UiohookKey } from "uiohook-napi";
 
-import { Point, Region } from "../../../common/types";
-import wrapWithModifiers from "../helpers/wrapWithModifiers.js";
-
-type Action = "pressKey" | "releaseKey";
+type Variant = "down" | "up";
 
 class KeyPressReleaseAction {
-  #button: Button;
-  #action: Action;
+  #keycode: number;
+  #action: Variant;
   #alt: boolean = false;
   #ctrl: boolean = false;
   #meta: boolean = false;
   #shift: boolean = false;
 
-  constructor(button: Button, action: Action) {
-    this.#button = button;
+  constructor(action: Variant, keycode: number) {
+    this.#keycode = keycode;
     this.#action = action;
   }
 
@@ -40,37 +35,24 @@ class KeyPressReleaseAction {
     return this;
   }
 
-  async #exec(x?: number, y?: number): Promise<void>;
-  async #exec(point: Point): Promise<void>;
-  async #exec(...args: any[]) {
-    if (getType(args[0]) === types.Object) {
-      const { x, y } = args[0] as { x: number; y: number };
-      await mouse.setPosition(new NutPoint(x, y));
-    } else if (args[0] !== undefined && args[1] !== undefined) {
-      const [x, y] = args as number[];
-      await mouse.setPosition(new NutPoint(x, y));
+  async send() {
+    if (this.#alt) {
+      uIOhook.keyToggle(UiohookKey.Alt, this.#action);
     }
 
-    await wrapWithModifiers(async () => {
-      await mouse[this.#action](this.#button);
-    }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
-  }
+    if (this.#ctrl) {
+      uIOhook.keyToggle(UiohookKey.Ctrl, this.#action);
+    }
 
-  async at(x: number, y: number): Promise<void>;
-  async at(point: Point): Promise<void>;
-  async at(...args: any[]) {
-    return this.#exec(...args);
-  }
+    if (this.#meta) {
+      uIOhook.keyToggle(UiohookKey.Meta, this.#action);
+    }
 
-  async here() {
-    await this.#exec();
-  }
+    if (this.#shift) {
+      uIOhook.keyToggle(UiohookKey.Shift, this.#action);
+    }
 
-  async center(region?: Region): Promise<void>;
-  async center(region: { region: Region }): Promise<void>;
-  async center(arg?: any) {
-    const point = await toCenterPoint(arg);
-    await this.#exec(point);
+    uIOhook.keyToggle(this.#keycode, this.#action);
   }
 }
 

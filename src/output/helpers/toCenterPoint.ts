@@ -1,4 +1,4 @@
-import { Point, Region } from "../../types";
+import { Point, Region } from "../../common/types";
 import { screen } from "@nut-tree/nut-js";
 
 async function toCenterPoint(region?: Region): Promise<Point>;
