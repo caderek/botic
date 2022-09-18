@@ -1,6 +1,6 @@
 import IOHandle from "../handles/IOHandle.js";
 import { GlobalKeyboardEvent, Hook } from "../../common/types";
-import { KeyCodesInput } from "../../common/constants.js";
+import { KeyCodesInput, KeysInput } from "../../common/constants.js";
 
 const ANY_KEY = -1;
 
@@ -55,10 +55,10 @@ class KeyPressReleaseHook implements Hook {
     const predicate = (e: GlobalKeyboardEvent) =>
       (this.#keycode === ANY_KEY || e.key === KeyCodesInput[this.#keycode]) &&
       (this.#all ||
-        (e.alt === this.#alt &&
-          e.ctrl === this.#ctrl &&
-          e.meta === this.#meta &&
-          e.shift === this.#shift));
+        ((e.alt === this.#alt || this.#keycode === KeysInput.Alt) &&
+          (e.ctrl === this.#ctrl || this.#keycode === KeysInput.Ctrl) &&
+          (e.meta === this.#meta || this.#keycode === KeysInput.Meta) &&
+          (e.shift === this.#shift || this.#keycode === KeysInput.Shift)));
 
     return new IOHandle(
       this.#id,
