@@ -1,6 +1,6 @@
 import clipboard from "clipboardy";
-import { keyboard, Key } from "@nut-tree/nut-js";
-import { RegularKeys, ShiftedKeys } from "../../common/constants.js";
+import { keyboard } from "@nut-tree/nut-js";
+import { RegularKeys, ShiftedKeys, Keys } from "../../common/constants.js";
 import delay from "../../utils/delay.js";
 import { randomInt } from "../helpers/random.js";
 
@@ -47,10 +47,10 @@ class KeyTypeAction {
 
   async #pasteChar(char: string) {
     clipboard.writeSync(char);
-    await keyboard.pressKey(Key.LeftControl);
-    await keyboard.pressKey(Key.V);
-    await keyboard.releaseKey(Key.V);
-    await keyboard.releaseKey(Key.LeftControl);
+    await keyboard.pressKey(Keys.Ctrl);
+    await keyboard.pressKey(Keys.V);
+    await keyboard.releaseKey(Keys.V);
+    await keyboard.releaseKey(Keys.Ctrl);
   }
 
   async #typeKey(keycode: number) {
@@ -59,18 +59,18 @@ class KeyTypeAction {
   }
 
   async #typeShiftedKey(keycode: number) {
-    await keyboard.pressKey(Key.LeftShift);
+    await keyboard.pressKey(Keys.Shift);
     await keyboard.pressKey(keycode);
     await keyboard.releaseKey(keycode);
-    await keyboard.releaseKey(Key.LeftShift);
+    await keyboard.releaseKey(Keys.Shift);
   }
 
   async #sendInstant(phrase: string) {
     clipboard.writeSync(phrase);
-    await keyboard.pressKey(Key.LeftControl);
-    await keyboard.pressKey(Key.V);
-    await keyboard.releaseKey(Key.V);
-    await keyboard.releaseKey(Key.LeftControl);
+    await keyboard.pressKey(Keys.Ctrl);
+    await keyboard.pressKey(Keys.V);
+    await keyboard.releaseKey(Keys.V);
+    await keyboard.releaseKey(Keys.Ctrl);
   }
 
   async #sendDelayed(phrase: string) {

@@ -1,4 +1,5 @@
-import { uIOhook, UiohookKey } from "uiohook-napi";
+import { keyboard } from "@nut-tree/nut-js";
+import wrapWithModifiers from "../helpers/wrapWithModifiers.js";
 
 class KeyTapAction {
   #keycode: number;
@@ -32,14 +33,10 @@ class KeyTapAction {
   }
 
   async send() {
-    const modifiers = [
-      ...(this.#alt ? [UiohookKey.Alt] : []),
-      ...(this.#ctrl ? [UiohookKey.Ctrl] : []),
-      ...(this.#meta ? [UiohookKey.Meta] : []),
-      ...(this.#shift ? [UiohookKey.Shift] : []),
-    ];
-
-    uIOhook.keyTap(this.#keycode, modifiers);
+    keyboard.config.autoDelayMs = 0;
+    await wrapWithModifiers(async () => {
+      await keyboard.type(this.#keycode);
+    }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 }
 

@@ -12,9 +12,9 @@ import {
   MouseEventType,
   WheelEventType,
   MouseButton,
-  KeysNames,
   VerticalScroll,
   HorizontalScroll,
+  KeyCodesInput,
 } from "../../common/constants.js";
 
 import { HookHandle, GlobalInputEvent } from "../../common/types";
@@ -65,8 +65,7 @@ const prepareEvent = (e: UiohookInputEvent): GlobalInputEvent => {
         ctrl: e.ctrlKey,
         meta: e.metaKey,
         shift: e.shiftKey,
-        key: e.keycode,
-        keyName: KeysNames.get(e.keycode) ?? "OTHER",
+        key: KeyCodesInput[e.keycode] ?? "OTHER",
       };
 
     case EventType.EVENT_MOUSE_WHEEL:

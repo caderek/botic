@@ -1,14 +1,15 @@
-import { keyboard, Key } from "@nut-tree/nut-js";
+import { keyboard } from "@nut-tree/nut-js";
+import { Keys } from "../../common/constants.js";
 
 const wrapWithModifiers = async (
   fn: () => Promise<void>,
   [alt, ctrl, meta, shift]: boolean[]
 ) => {
   const modifiers = [
-    ...(alt ? [Key.LeftAlt] : []),
-    ...(ctrl ? [Key.LeftControl] : []),
-    ...(meta ? [Key.LeftSuper] : []),
-    ...(shift ? [Key.LeftShift] : []),
+    ...(alt ? [Keys.Alt] : []),
+    ...(ctrl ? [Keys.Ctrl] : []),
+    ...(meta ? [Keys.Meta] : []),
+    ...(shift ? [Keys.Shift] : []),
   ];
 
   if (modifiers.length > 0) {

@@ -1,4 +1,5 @@
-import { mouse, keyboard, Key } from "@nut-tree/nut-js";
+import { mouse } from "@nut-tree/nut-js";
+import wrapWithModifiers from "../helpers/wrapWithModifiers.js";
 
 type Action = "scrollDown" | "scrollUp" | "scrollLeft" | "scrollRight";
 
@@ -34,22 +35,9 @@ class MouseScrollAction {
   }
 
   async many(amount: number) {
-    const modifiers = [
-      ...(this.#alt ? [Key.LeftAlt] : []),
-      ...(this.#ctrl ? [Key.LeftControl] : []),
-      ...(this.#meta ? [Key.LeftSuper] : []),
-      ...(this.#shift ? [Key.LeftShift] : []),
-    ];
-
-    if (modifiers.length > 0) {
-      await keyboard.pressKey(...modifiers);
-    }
-
-    await mouse[this.#action](amount);
-
-    if (modifiers.length > 0) {
-      await keyboard.releaseKey(...modifiers);
-    }
+    await wrapWithModifiers(async () => {
+      await mouse[this.#action](amount);
+    }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
   async once() {
