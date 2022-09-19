@@ -1,4 +1,4 @@
-import { WheelDirection, UiohookKey } from "uiohook-napi";
+import { WheelDirection } from "uiohook-napi";
 import {
   KeyboardEventType,
   MouseEventType,
@@ -44,7 +44,7 @@ export type GlobalKeyboardEvent = {
   ctrl: boolean;
   meta: boolean;
   shift: boolean;
-  key: KeyInputName | "OTHER";
+  key: KeyInputName | "Other";
 };
 
 export type GlobalInputEvent =
@@ -76,4 +76,18 @@ export interface Region {
   top: number;
   width: number;
   height: number;
+}
+
+export interface Window {
+  handle: number;
+  workspace: number;
+  type: string;
+  name: string;
+  region: Region;
+  center: Point;
+}
+
+export interface WindowsManager {
+  list(): Promise<Window[]>;
+  active(): Promise<Window | null>;
 }

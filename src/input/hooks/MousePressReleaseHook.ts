@@ -51,7 +51,7 @@ class MousePressReleaseHook implements Hook {
 
   do(handler: (e: GlobalMouseEvent) => void) {
     const predicate = (e: GlobalMouseEvent) =>
-      (this.#button === MouseButton.NONE || e.button === this.#button) &&
+      (this.#button === MouseButton.None || e.button === this.#button) &&
       (this.#all ||
         (e.alt === this.#alt &&
           e.ctrl === this.#ctrl &&

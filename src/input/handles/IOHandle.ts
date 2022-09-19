@@ -65,7 +65,7 @@ const prepareEvent = (e: UiohookInputEvent): GlobalInputEvent => {
         ctrl: e.ctrlKey,
         meta: e.metaKey,
         shift: e.shiftKey,
-        key: KeyCodesInput[e.keycode] ?? "OTHER",
+        key: KeyCodesInput[e.keycode] ?? "Other",
       };
 
     case EventType.EVENT_MOUSE_WHEEL:

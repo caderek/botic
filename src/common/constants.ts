@@ -1,25 +1,24 @@
-import { UiohookKey } from "uiohook-napi";
 import { Keys, KeyCodes } from "./Keys.js";
 import { KeysInput, KeyCodesInput } from "./KeysInput.js";
 
 export { Keys, KeyCodes, KeysInput, KeyCodesInput };
 
 export enum MouseButton {
-  ANY = -1,
-  NONE,
-  LEFT,
-  RIGHT,
-  MIDDLE,
+  Any = -1,
+  None,
+  Left,
+  Right,
+  Middle,
 }
 
 export enum VerticalScroll {
-  UP = -1,
-  DOWN = 1,
+  Up = -1,
+  Down = 1,
 }
 
 export enum HorizontalScroll {
-  LEFT = -1,
-  RIGHT = 1,
+  Left = -1,
+  Right = 1,
 }
 
 export enum KeyboardEventType {
@@ -47,12 +46,6 @@ export enum InputEventType {
   MOUSE_MOVED = 9,
   MOUSE_SCROLL = 11,
 }
-
-export const KeycodeByName = UiohookKey;
-
-export const KeysNames = new Map(
-  Object.entries(UiohookKey).map(([key, code]) => [code, key])
-) as Map<number, keyof typeof UiohookKey>;
 
 export const RegularKeys = {
   "0": Keys.Digit0,

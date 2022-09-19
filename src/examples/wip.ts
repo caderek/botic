@@ -1,27 +1,35 @@
 import $ from "../index.js";
+import WindowsManagerLinux from "../screen/windows/WindowsManagerLinux.js";
 
-$.listen.key.press.Ctrl.Alt.do((e) => {
-  console.log(e.key);
-});
+const win = new WindowsManagerLinux();
+const wins = await win.list();
+
+console.log(wins);
+
+console.log(await win.active());
+
+const adw = wins.find((win) => win.name.includes("Adw"));
+
+if (adw) {
+  await win.activate(adw);
+}
+
+// @todo - Maybe add delay after activate to ensure that the new window is active when called for win.active()? Or ignore.
+await $.delay(1000);
+
+console.log(await win.active());
+
+// $.listen.mouse.click.Left.double.do(async () => {
+//   const win = await $.window();
+//   console.log(win);
+// });
 // @todo - no listen signal on lone modifiers
 
 // $.listen.key.press.Backquote.do(async () => {
-//   $.loop.do(async () => {
-//     const { x, y } = await $.mouse.position;
-//     const area = {
-//       top: 400,
-//       left: 2080,
-//       width: 2335 - 2080,
-//       height: 640 - 400,
-//     };
+//   const p = { x: 3675, y: 920 };
 
-//     if (
-//       x >= area.left &&
-//       x <= area.left + area.width &&
-//       y >= area.top &&
-//       y <= area.top + area.height
-//     ) {
-//       await $.mouse.click.Left.here();
-//     }
+//   $.loop.do(async () => {
+//     await $.mouse.click.Left.at(p);
+//     await $.delay(60 * 1000);
 //   });
 // });
