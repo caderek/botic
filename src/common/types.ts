@@ -81,8 +81,8 @@ export interface Region {
 export interface Window {
   handle: number;
   workspace: number;
-  type: string;
-  name: string;
+  app: string;
+  title: string;
   region: Region;
   center: Point;
 }

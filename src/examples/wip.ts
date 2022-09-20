@@ -6,18 +6,19 @@ const wins = await win.list();
 
 console.log(wins);
 
+console.log("Current:");
 console.log(await win.active());
 
-const adw = wins.find((win) => win.name.includes("Adw"));
+// const adw = wins.find((win) => win.name.includes("Adw"));
 
-if (adw) {
-  await win.activate(adw);
-}
+// if (adw) {
+//   await win.activate(adw);
+// }
 
-// @todo - Maybe add delay after activate to ensure that the new window is active when called for win.active()? Or ignore.
-await $.delay(1000);
+// // @todo - Maybe add delay after activate to ensure that the new window is active when called for win.active()? Or ignore.
+// await $.delay(1000);
 
-console.log(await win.active());
+// console.log(await win.active());
 
 // $.listen.mouse.click.Left.double.do(async () => {
 //   const win = await $.window();
@@ -26,10 +27,21 @@ console.log(await win.active());
 // @todo - no listen signal on lone modifiers
 
 // $.listen.key.press.Backquote.do(async () => {
-//   const p = { x: 3675, y: 920 };
-
 //   $.loop.do(async () => {
-//     await $.mouse.click.Left.at(p);
-//     await $.delay(60 * 1000);
+//     await $.mouse.click.Left.here();
+//   });
+// });
+
+// $.listen.key.press.Backquote.do(async () => {
+//   const game = wins.find((win) => win.name.includes("Cookie Clicker"));
+
+//   if (game) {
+//     await win.activate(game);
+//   }
+//   $.loop.do(async () => {
+//     await $.mouse.move.fast.right(300);
+//     await $.mouse.move.fast.down(300);
+//     await $.mouse.move.fast.left(300);
+//     await $.mouse.move.fast.up(300);
 //   });
 // });
