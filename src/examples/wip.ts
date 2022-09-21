@@ -6,8 +6,17 @@ const wins = await win.list();
 
 console.log(wins);
 
-console.log("Current:");
-console.log(await win.active());
+console.log("Active:");
+console.log(await win.getActive());
+
+// win.open("https://lichess.org/");
+
+const app = win.run("vlc");
+
+// $.listen.key.press.Backquote.once.do(async () => {
+//   console.log("Hejo!");
+//   app.kill();
+// });
 
 // const adw = wins.find((win) => win.name.includes("Adw"));
 

@@ -80,6 +80,7 @@ export interface Region {
 
 export interface Window {
   handle: number;
+  pid: number;
   workspace: number;
   app: string;
   title: string;
@@ -89,5 +90,5 @@ export interface Window {
 
 export interface WindowsManager {
   list(): Promise<Window[]>;
-  active(): Promise<Window | null>;
+  getActive(): Promise<Window | null>;
 }
