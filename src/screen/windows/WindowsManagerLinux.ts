@@ -26,8 +26,10 @@ const prepareAppName = (wmClass: string) => {
 
 // @todo region and center should maybe be getters on window object to always get current stat
 class WindowsManagerLinux implements WindowsManager {
+  // @todo add wmctrl command detection and info
   constructor() {}
 
+  // @todo List fails if window is during closing - suppress error and retry
   async list() {
     const out = execSync("wmctrl -l -G -x -p").toString();
     const [_, ...lines] = out.match(WINDOWS_REGEX) ?? [];
@@ -89,18 +91,50 @@ class WindowsManagerLinux implements WindowsManager {
     execSync(`open ${urlOrFile}`);
   }
 
+  async #findNewWindow(
+    pid: number | undefined,
+    prevWindows: Window[]
+  ): Promise<Window> {
+    const windows = await this.list();
+    const windowWithPID = windows.find((w) => w.pid === pid);
+
+    if (windowWithPID) {
+      return windowWithPID;
+    }
+
+    const oldHandles = new Set(prevWindows.map((w) => w.handle));
+    const newWindow = windows.find((w) => !oldHandles.has(w.handle));
+
+    if (newWindow) {
+      return newWindow;
+    }
+
+    await delay(250);
+    return this.#findNewWindow(pid, prevWindows);
+  }
+
   async run(app: string, ...args: string[]) {
+    const prevWindows = await this.list();
     const child = spawn(app, args, {
       detached: true,
       stdio: ["ignore", "ignore", "ignore"],
     });
     child.unref();
 
-    await delay(2000);
-    const windows = await this.list();
-    const win = windows.find((w) => w.pid === child.pid);
-    console.log({ pid: child.pid });
-    console.log({ newWindow: win });
+    return this.#findNewWindow(child.pid, prevWindows);
+  }
+
+  async close(window: Window): Promise<void>;
+  async close(window: number): Promise<void>;
+  async close(window: string): Promise<void>;
+  async close(window: any) {
+    if (typeof window === "number") {
+      execSync(`wmctrl -i -c ${window}`);
+    } else if (typeof window === "string") {
+      execSync(`wmctrl -c ${window}`);
+    } else {
+      execSync(`wmctrl -i -c ${window.handle}`);
+    }
   }
 }
 

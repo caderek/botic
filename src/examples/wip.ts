@@ -2,16 +2,21 @@ import $ from "../index.js";
 import WindowsManagerLinux from "../screen/windows/WindowsManagerLinux.js";
 
 const win = new WindowsManagerLinux();
-const wins = await win.list();
 
-console.log(wins);
-
-console.log("Active:");
-console.log(await win.getActive());
+console.log({ active: await win.getActive() });
 
 // win.open("https://lichess.org/");
 
-const app = win.run("vlc");
+const app = await win.run("vlc");
+
+console.log({ app });
+
+await $.delay(3000);
+await win.close(app);
+await $.delay(1000);
+const wins = await win.list();
+
+console.log(wins);
 
 // $.listen.key.press.Backquote.once.do(async () => {
 //   console.log("Hejo!");
