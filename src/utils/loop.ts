@@ -95,6 +95,9 @@ class Loop {
 
       if (interval) {
         await delay(interval);
+      } else {
+        // To unblock the loop for events
+        await delay(0);
       }
     }
 

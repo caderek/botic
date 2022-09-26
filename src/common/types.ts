@@ -86,6 +86,7 @@ export interface Window {
   title: string;
   region: Region;
   center: Point;
+  isActive: boolean;
 }
 
 export interface WindowsManager {

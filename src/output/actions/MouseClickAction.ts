@@ -50,6 +50,8 @@ class MouseClickAction {
   async #exec(x?: number, y?: number): Promise<void>;
   async #exec(point: Point): Promise<void>;
   async #exec(...args: any[]) {
+    mouse.config.autoDelayMs = 0;
+
     if (getType(args[0]) === types.Object) {
       const point = args[0] as { x: number; y: number };
       await mouse.setPosition(point);

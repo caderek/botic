@@ -1,6 +1,5 @@
 import KeyTapAction from "../actions/KeyTapAction.js";
-import getKeyError from "../../common/errors/getKeyError.js";
-
+import { KeyError } from "../../common/errors/errors.js";
 import { Keys } from "../../common/constants.js";
 import { KeyName } from "../../common/types";
 
@@ -16,7 +15,7 @@ const createKeyPressReleaseProxy = () => {
     {
       get(_, prop) {
         if (!Keys.hasOwnProperty(prop)) {
-          throw getKeyError(prop);
+          throw new KeyError(prop);
         }
 
         let keycode: number = Keys[prop as KeyName];

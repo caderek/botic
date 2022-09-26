@@ -1,6 +1,5 @@
 import KeyPressReleaseHook from "../hooks/KeyPressReleaseHook.js";
-import getKeyError from "../../common/errors/getKeyError.js";
-
+import { KeyError } from "../../common/errors/errors.js";
 import { KeysInput } from "../../common/constants.js";
 import { KeyInputName } from "../../common/types";
 
@@ -21,7 +20,7 @@ const createKeyProxy = (type: "keydown" | "keyup") => {
         }
 
         if (!KeysInput.hasOwnProperty(prop)) {
-          throw getKeyError(prop);
+          throw new KeyError(prop);
         }
 
         let keycode: number = KeysInput[prop as KeyInputName];

@@ -1,61 +1,6 @@
 import $ from "../index.js";
-import WindowsManagerLinux from "../screen/windows/WindowsManagerLinux.js";
 
-const win = new WindowsManagerLinux();
-
-console.log({ active: await win.getActive() });
-
-// win.open("https://lichess.org/");
-
-const app = await win.run("vlc");
-
-console.log({ app });
-
-await $.delay(3000);
-await win.close(app);
-await $.delay(1000);
-const wins = await win.list();
-
-console.log(wins);
-
-// $.listen.key.press.Backquote.once.do(async () => {
-//   console.log("Hejo!");
-//   app.kill();
-// });
-
-// const adw = wins.find((win) => win.name.includes("Adw"));
-
-// if (adw) {
-//   await win.activate(adw);
-// }
-
-// // @todo - Maybe add delay after activate to ensure that the new window is active when called for win.active()? Or ignore.
-// await $.delay(1000);
-
-// console.log(await win.active());
-
-// $.listen.mouse.click.Left.double.do(async () => {
-//   const win = await $.window();
-//   console.log(win);
-// });
-// @todo - no listen signal on lone modifiers
-
-// $.listen.key.press.Backquote.do(async () => {
-//   $.loop.do(async () => {
-//     await $.mouse.click.Left.here();
-//   });
-// });
-
-// $.listen.key.press.Backquote.do(async () => {
-//   const game = wins.find((win) => win.name.includes("Cookie Clicker"));
-
-//   if (game) {
-//     await win.activate(game);
-//   }
-//   $.loop.do(async () => {
-//     await $.mouse.move.fast.right(300);
-//     await $.mouse.move.fast.down(300);
-//     await $.mouse.move.fast.left(300);
-//     await $.mouse.move.fast.up(300);
-//   });
-// });
+console.log(await $.screen.open.file("package.json"));
+// console.log(await $.screen.open.file("package.json"));
+// console.log(await $.screen.open.file("package.json"));
+console.log(await $.screen.open.url("lichess.org"));
