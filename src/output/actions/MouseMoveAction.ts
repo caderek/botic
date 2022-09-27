@@ -5,6 +5,28 @@ import toCenterPoint from "../helpers/toCenterPoint.js";
 import toRandomPoint from "../helpers/toRandomPoint.js";
 
 import { Point, Region } from "../../common/types";
+import circular from "../path-generators/circular.js";
+
+type OnStep = ((point: Point) => Promise<void> | void) | null;
+
+type CircularOptions = {
+  angle?: number;
+  startAngle?: number;
+  onStep?: OnStep;
+};
+
+const defaultCircularOptions: Required<CircularOptions> = {
+  angle: 360,
+  startAngle: 0,
+  onStep: null,
+};
+
+function pointsOnCircle(radius: number, angle: number, cx: number, cy: number) {
+  angle = angle * (Math.PI / 180);
+  const x = cx + radius * Math.sin(angle);
+  const y = cy + radius * Math.cos(angle);
+  return { x, y };
+}
 
 class MouseMoveAction {
   #alt: boolean = false;
@@ -143,6 +165,43 @@ class MouseMoveAction {
   async random(arg?: any) {
     const point = await toRandomPoint(arg);
     await this.to(point);
+  }
+
+  async circular(radius: number, options: CircularOptions = {}) {
+    const center = this.#from ?? (await mouse.getPosition());
+
+    await this.path(
+      circular({
+        center,
+        radius,
+        angle: options.angle,
+        startAngle: options.startAngle,
+      }),
+      options.onStep ?? null,
+      true
+    );
+
+    await mouse.setPosition(center);
+  }
+
+  async path(
+    points: Point[] | Generator<Point>,
+    onStep: OnStep,
+    jumpToFirst: boolean = false
+  ) {
+    let first = true;
+    for (const point of points) {
+      if (first && jumpToFirst) {
+        await mouse.setPosition(point);
+        first = false;
+      } else {
+        await mouse.move(straightTo(point));
+      }
+
+      if (onStep) {
+        await onStep(point);
+      }
+    }
   }
 }
 

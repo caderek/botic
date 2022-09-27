@@ -17,6 +17,11 @@ class MouseClickAction {
     this.#button = button;
   }
 
+  times(amount: number) {
+    this.#clicks = amount;
+    return this;
+  }
+
   get double() {
     this.#clicks = 2;
     return this;

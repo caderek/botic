@@ -19,6 +19,7 @@ const open = {
     const prevWindows = await list();
     execSync(`open ${path}`);
 
+    await delay(1000); // Slight delay for window title to get loaded
     return findNewWindow(prevWindows);
   },
 

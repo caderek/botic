@@ -4,14 +4,21 @@ import $ from "../index.js";
 let state = {
   pause: false,
   go: false,
+  wrinklers: false,
 };
 
-const cookieRegion = { left: 2090, top: 400, width: 256, height: 256 };
+const cookieRegion = { left: 1920, top: 235, width: 550, height: 600 };
 
 $.listen.key.press.Escape.Ctrl.do(() => process.exit());
 
 $.listen.key.press.Backquote.do(() => {
   state.pause = !state.pause;
+  logUpdate(`Pause: ${state.pause}`);
+});
+
+$.listen.key.press.Digit1.do(() => {
+  state.wrinklers = !state.wrinklers;
+  logUpdate(`Clear wrinklers: ${state.wrinklers}`);
 });
 
 $.listen.mouse.move.do(async (e) => {
@@ -44,5 +51,15 @@ $.loop.do(async () => {
     if (i % 1000 === 0) {
       logUpdate(`Clicked ${BigInt(j) * BigInt(base) + BigInt(i)} times!`);
     }
+
+    if (state.wrinklers && i % 5000 === 0) {
+      await $.mouse.move.veryFast.circular(200, {
+        async onStep(point) {
+          await $.mouse.click.Left.times(10).at(point);
+        },
+      });
+    }
   }
 });
+
+console.clear();
