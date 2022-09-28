@@ -6,37 +6,43 @@ type Config = {
   radius: number;
   angle?: number;
   startAngle?: number;
+  segments?: number;
 };
 
 const defaults = {
   angle: 360,
   startAngle: 0,
+  segments: Infinity,
 };
 
-function pointsOnCircle(radius: number, angle: number, cx: number, cy: number) {
+function pointOnCircle(radius: number, angle: number, cx: number, cy: number) {
   angle = angle * (Math.PI / 180);
   const x = cx + radius * Math.sin(angle);
   const y = cy + radius * Math.cos(angle);
   return { x, y };
 }
 
-function* circular(options: Config) {
+// @todo start from top not bottom, handle angle > 360 degrees (loop or error)
+function* polygon(options: Config) {
   const config = { ...defaults, ...(ignoreUndefinedProps(options) as Config) };
 
-  const slices = config.radius;
-  const angleIncrease = 360 / slices;
+  const segments =
+    config.segments === Infinity
+      ? Math.round(config.radius * Math.PI)
+      : config.segments;
+
+  const angleIncrease = config.angle / segments;
   const steps = Math.ceil(config.angle / angleIncrease);
-  const fluidAngleIncrease = config.angle / steps;
   const center = config.center;
 
-  for (let i = 0; i < steps; i++) {
-    yield pointsOnCircle(
+  for (let i = 0; i <= steps; i++) {
+    yield pointOnCircle(
       config.radius,
-      fluidAngleIncrease * i + config.startAngle,
+      config.startAngle + angleIncrease * i,
       center.x,
       center.y
     );
   }
 }
 
-export default circular;
+export default polygon;

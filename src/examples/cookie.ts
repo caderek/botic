@@ -52,10 +52,10 @@ $.loop.do(async () => {
       logUpdate(`Clicked ${BigInt(j) * BigInt(base) + BigInt(i)} times!`);
     }
 
-    if (state.wrinklers && i % 5000 === 0) {
-      await $.mouse.move.veryFast.circular(200, {
+    if (state.wrinklers && i % 10000 === 0) {
+      await $.mouse.move.veryFast.circle(200, {
         async onStep(point) {
-          await $.mouse.click.Left.times(10).at(point);
+          await $.mouse.click.Left.at(point);
         },
       });
     }

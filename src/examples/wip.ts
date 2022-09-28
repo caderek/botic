@@ -14,9 +14,9 @@ import $ from "../index.js";
 // });
 
 $.listen.key.press.Backquote.do(async () => {
-  await $.mouse.move.circular(100, {
-    onStep: async (point) => {
-      $.mouse.click.Left.at(point);
-    },
+  await $.mouse.move.veryFast.circle(100, {
+    // segments: 100,
+    angle: 360,
+    startAngle: 0,
   });
 });

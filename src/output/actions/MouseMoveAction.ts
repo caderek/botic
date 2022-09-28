@@ -5,19 +5,21 @@ import toCenterPoint from "../helpers/toCenterPoint.js";
 import toRandomPoint from "../helpers/toRandomPoint.js";
 
 import { Point, Region } from "../../common/types";
-import circular from "../path-generators/circular.js";
+import polygon from "../path-generators/polygon.js";
 
 type OnStep = ((point: Point) => Promise<void> | void) | null;
 
 type CircularOptions = {
   angle?: number;
   startAngle?: number;
+  segments?: number;
   onStep?: OnStep;
 };
 
 const defaultCircularOptions: Required<CircularOptions> = {
   angle: 360,
   startAngle: 0,
+  segments: Infinity,
   onStep: null,
 };
 
@@ -118,36 +120,48 @@ class MouseMoveAction {
   }
 
   async horizontal(pixelsX: number) {
+    mouse.config.mouseSpeed = this.#speed;
+    mouse.config.autoDelayMs = this.#delay;
     await wrapWithModifiers(async () => {
       await mouse.move(right(pixelsX));
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
   async vertical(pixelsY: number) {
+    mouse.config.mouseSpeed = this.#speed;
+    mouse.config.autoDelayMs = this.#delay;
     await wrapWithModifiers(async () => {
       await mouse.move(down(pixelsY));
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
   async left(pixels: number) {
+    mouse.config.mouseSpeed = this.#speed;
+    mouse.config.autoDelayMs = this.#delay;
     await wrapWithModifiers(async () => {
       await mouse.move(left(Math.abs(pixels)));
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
   async right(pixels: number) {
+    mouse.config.mouseSpeed = this.#speed;
+    mouse.config.autoDelayMs = this.#delay;
     await wrapWithModifiers(async () => {
       await mouse.move(right(Math.abs(pixels)));
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
   async up(pixels: number) {
+    mouse.config.mouseSpeed = this.#speed;
+    mouse.config.autoDelayMs = this.#delay;
     await wrapWithModifiers(async () => {
       await mouse.move(up(Math.abs(pixels)));
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
   async down(pixels: number) {
+    mouse.config.mouseSpeed = this.#speed;
+    mouse.config.autoDelayMs = this.#delay;
     await wrapWithModifiers(async () => {
       await mouse.move(down(Math.abs(pixels)));
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
@@ -167,15 +181,16 @@ class MouseMoveAction {
     await this.to(point);
   }
 
-  async circular(radius: number, options: CircularOptions = {}) {
+  async circle(radius: number, options: CircularOptions = {}) {
     const center = this.#from ?? (await mouse.getPosition());
 
     await this.path(
-      circular({
+      polygon({
         center,
         radius,
         angle: options.angle,
         startAngle: options.startAngle,
+        segments: options.segments,
       }),
       options.onStep ?? null,
       true
@@ -189,6 +204,9 @@ class MouseMoveAction {
     onStep: OnStep,
     jumpToFirst: boolean = false
   ) {
+    mouse.config.mouseSpeed = this.#speed;
+    mouse.config.autoDelayMs = this.#delay;
+
     let first = true;
     for (const point of points) {
       if (first && jumpToFirst) {
