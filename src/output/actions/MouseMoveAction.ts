@@ -6,6 +6,7 @@ import toRandomPoint from "../helpers/toRandomPoint.js";
 
 import { Point, Region } from "../../common/types";
 import polygon from "../path-generators/polygon.js";
+import delay from "../../utils/delay.js";
 
 type OnStep = ((point: Point) => Promise<void> | void) | null;
 
@@ -196,7 +197,22 @@ class MouseMoveAction {
       true
     );
 
+    await mouse.setPosition({ x: 0, y: 0 });
+    const path = await straightTo({ x: 10, y: 4 });
+
+    console.log(path);
+
     await mouse.setPosition(center);
+  }
+
+  async path2(points: Point[] | Generator<Point>) {
+    for (const point of points) {
+      await mouse.setPosition(point);
+
+      if (this.#delay > 0) {
+        await delay(this.#delay * point.v);
+      }
+    }
   }
 
   async path(
