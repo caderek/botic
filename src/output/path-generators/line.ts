@@ -14,17 +14,17 @@ function* line({ start, end }: Config) {
   const deltaY = Math.abs(end.y - start.y);
   const steps = Math.max(deltaX, deltaY);
   const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
-  const baseSpeed = steps / distance;
+  const delayModifier = distance / steps;
 
   const signX = end.x > start.x ? 1 : -1;
   const signY = end.y > start.y ? 1 : -1;
   const incrementX = (deltaX / steps) * signX;
   const incrementY = (deltaY / steps) * signY;
 
-  for (let i = 1; i <= steps; i++) {
+  for (let i = 0; i <= steps; i++) {
     const x = start.x + Math.round(incrementX * i);
     const y = start.y + Math.round(incrementY * i);
-    yield { x, y, v: baseSpeed };
+    yield { x, y, mod: delayModifier };
   }
 }
 

@@ -1,7 +1,7 @@
 import { execSync } from "node:child_process";
 
-async function open(urlOrFile: string) {
+async function openFileOrUrl(urlOrFile: string) {
   execSync(`open ${urlOrFile}`);
 }
 
-export default open;
+export default openFileOrUrl;

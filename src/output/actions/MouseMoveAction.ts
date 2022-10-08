@@ -6,22 +6,23 @@ import toRandomPoint from "../helpers/toRandomPoint.js";
 
 import { Point, Region } from "../../common/types";
 import polygon from "../path-generators/polygon.js";
+import line from "../path-generators/line.js";
 import delay from "../../utils/delay.js";
 
-type OnStep = ((point: Point) => Promise<void> | void) | null;
+type OnStepHandler =
+  | ((point: Point, index: number) => Promise<void> | void)
+  | null;
 
 type CircularOptions = {
   angle?: number;
   startAngle?: number;
   segments?: number;
-  onStep?: OnStep;
 };
 
 const defaultCircularOptions: Required<CircularOptions> = {
   angle: 360,
   startAngle: 0,
   segments: Infinity,
-  onStep: null,
 };
 
 function pointsOnCircle(radius: number, angle: number, cx: number, cy: number) {
@@ -36,9 +37,9 @@ class MouseMoveAction {
   #ctrl: boolean = false;
   #meta: boolean = false;
   #shift: boolean = false;
-  #speed: number = 2000;
-  #delay: number = 0;
+  #delay: number = 2;
   #from?: Point;
+  #onStep: OnStepHandler = null;
 
   constructor() {}
 
@@ -47,28 +48,23 @@ class MouseMoveAction {
     return this;
   }
 
-  speed(value: number) {
-    this.#speed = value;
-    return this;
-  }
-
   get fast() {
-    this.#speed = 4000;
+    this.#delay = 1;
     return this;
   }
 
   get veryFast() {
-    this.#speed = 16000;
+    this.#delay = 0;
     return this;
   }
 
   get slow() {
-    this.#speed = 1000;
+    this.#delay = 4;
     return this;
   }
 
   get verySlow() {
-    this.#speed = 250;
+    this.#delay = 8;
     return this;
   }
 
@@ -92,6 +88,10 @@ class MouseMoveAction {
     return this;
   }
 
+  async onStep(handler: OnStepHandler) {
+    this.#onStep = handler;
+  }
+
   from(point: Point): MouseMoveAction;
   from(x: number, y: number): MouseMoveAction;
   from(...args: any[]) {
@@ -103,8 +103,6 @@ class MouseMoveAction {
   async to(x: number, y: number): Promise<void>;
   async to(...args: any[]) {
     const point = toPoint(args);
-    mouse.config.mouseSpeed = this.#speed;
-    mouse.config.autoDelayMs = this.#delay;
 
     await wrapWithModifiers(async () => {
       if (this.#from) {
@@ -121,48 +119,36 @@ class MouseMoveAction {
   }
 
   async horizontal(pixelsX: number) {
-    mouse.config.mouseSpeed = this.#speed;
-    mouse.config.autoDelayMs = this.#delay;
     await wrapWithModifiers(async () => {
       await mouse.move(right(pixelsX));
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
   async vertical(pixelsY: number) {
-    mouse.config.mouseSpeed = this.#speed;
-    mouse.config.autoDelayMs = this.#delay;
     await wrapWithModifiers(async () => {
       await mouse.move(down(pixelsY));
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
   async left(pixels: number) {
-    mouse.config.mouseSpeed = this.#speed;
-    mouse.config.autoDelayMs = this.#delay;
     await wrapWithModifiers(async () => {
       await mouse.move(left(Math.abs(pixels)));
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
   async right(pixels: number) {
-    mouse.config.mouseSpeed = this.#speed;
-    mouse.config.autoDelayMs = this.#delay;
     await wrapWithModifiers(async () => {
       await mouse.move(right(Math.abs(pixels)));
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
   async up(pixels: number) {
-    mouse.config.mouseSpeed = this.#speed;
-    mouse.config.autoDelayMs = this.#delay;
     await wrapWithModifiers(async () => {
       await mouse.move(up(Math.abs(pixels)));
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
   async down(pixels: number) {
-    mouse.config.mouseSpeed = this.#speed;
-    mouse.config.autoDelayMs = this.#delay;
     await wrapWithModifiers(async () => {
       await mouse.move(down(Math.abs(pixels)));
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
@@ -193,48 +179,40 @@ class MouseMoveAction {
         startAngle: options.startAngle,
         segments: options.segments,
       }),
-      options.onStep ?? null,
       true
     );
-
-    await mouse.setPosition({ x: 0, y: 0 });
-    const path = await straightTo({ x: 10, y: 4 });
-
-    console.log(path);
 
     await mouse.setPosition(center);
   }
 
-  async path2(points: Point[] | Generator<Point>) {
-    for (const point of points) {
-      await mouse.setPosition(point);
-
-      if (this.#delay > 0) {
-        await delay(this.#delay * point.v);
-      }
-    }
-  }
-
   async path(
-    points: Point[] | Generator<Point>,
-    onStep: OnStep,
-    jumpToFirst: boolean = false
+    checkpoints: Point[] | Generator<Point>,
+    jumpToFirst: boolean = true
   ) {
-    mouse.config.mouseSpeed = this.#speed;
-    mouse.config.autoDelayMs = this.#delay;
+    let i = 0;
+    let start = await mouse.getPosition();
 
-    let first = true;
-    for (const point of points) {
-      if (first && jumpToFirst) {
-        await mouse.setPosition(point);
-        first = false;
+    for (const checkpoint of checkpoints) {
+      if (i === 0 && jumpToFirst) {
+        await mouse.setPosition(checkpoint);
       } else {
-        await mouse.move(straightTo(point));
+        const points = line({ start, end: checkpoint });
+
+        for (const point of points) {
+          await mouse.setPosition(point);
+
+          if (this.#delay > 0) {
+            await delay(this.#delay * point.mod);
+          }
+        }
       }
 
-      if (onStep) {
-        await onStep(point);
+      if (this.#onStep) {
+        await this.#onStep(checkpoint, i);
       }
+
+      i++;
+      start = checkpoint;
     }
   }
 }

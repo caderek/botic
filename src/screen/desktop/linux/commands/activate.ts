@@ -1,5 +1,5 @@
 import { execSync } from "node:child_process";
-import { Window } from "../../../common/types";
+import { Window } from "../../../../common/types";
 import getActive from "./getActive.js";
 
 async function activate(window: Window): Promise<Window>;

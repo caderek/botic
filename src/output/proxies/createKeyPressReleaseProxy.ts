@@ -1,7 +1,6 @@
 import KeyPressReleaseAction from "../actions/KeyPressReleaseAction.js";
-import { Keys } from "../../common/constants.js";
 import { KeyError } from "../../common/errors/errors.js";
-
+import { Keys } from "../../common/constants.js";
 import { KeyName } from "../../common/types";
 
 /**
