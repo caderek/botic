@@ -202,7 +202,7 @@ class MouseMoveAction {
           await mouse.setPosition(point);
 
           if (this.#delay > 0) {
-            await delay(this.#delay * point.mod);
+            await delay(this.#delay);
           }
         }
       }
