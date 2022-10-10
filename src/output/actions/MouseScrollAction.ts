@@ -1,5 +1,5 @@
 import { mouse } from "@nut-tree/nut-js";
-import wrapWithModifiers from "../helpers/wrapWithModifiers.js";
+import { wrapWithModifiers } from "../helpers/modifiers.js";
 
 type Action = "scrollDown" | "scrollUp" | "scrollLeft" | "scrollRight";
 

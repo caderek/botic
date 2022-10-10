@@ -1,6 +1,10 @@
 import { mouse, left, right, up, down, straightTo } from "@nut-tree/nut-js";
 import toPoint from "../helpers/toPoint.js";
-import wrapWithModifiers from "../helpers/wrapWithModifiers.js";
+import {
+  wrapWithModifiers,
+  pressModifiers,
+  releaseModifiers,
+} from "../helpers/modifiers.js";
 import toCenterPoint from "../helpers/toCenterPoint.js";
 import toRandomPoint from "../helpers/toRandomPoint.js";
 
@@ -9,7 +13,7 @@ import polygon from "../path-generators/polygon.js";
 import line from "../path-generators/line.js";
 import delay from "../../utils/delay.js";
 
-type OnStepHandler =
+type OnCheckpointHandler =
   | ((point: Point, index: number) => Promise<void> | void)
   | null;
 
@@ -19,19 +23,6 @@ type CircularOptions = {
   segments?: number;
 };
 
-const defaultCircularOptions: Required<CircularOptions> = {
-  angle: 360,
-  startAngle: 0,
-  segments: Infinity,
-};
-
-function pointsOnCircle(radius: number, angle: number, cx: number, cy: number) {
-  angle = angle * (Math.PI / 180);
-  const x = cx + radius * Math.sin(angle);
-  const y = cy + radius * Math.cos(angle);
-  return { x, y };
-}
-
 class MouseMoveAction {
   #alt: boolean = false;
   #ctrl: boolean = false;
@@ -39,7 +30,7 @@ class MouseMoveAction {
   #shift: boolean = false;
   #delay: number = 2;
   #from?: Point;
-  #onStep: OnStepHandler = null;
+  #onCheckpoint: OnCheckpointHandler = null;
 
   constructor() {}
 
@@ -88,8 +79,8 @@ class MouseMoveAction {
     return this;
   }
 
-  async onStep(handler: OnStepHandler) {
-    this.#onStep = handler;
+  async onCheckpoint(handler: OnCheckpointHandler) {
+    this.#onCheckpoint = handler;
   }
 
   from(point: Point): MouseMoveAction;
@@ -103,13 +94,10 @@ class MouseMoveAction {
   async to(x: number, y: number): Promise<void>;
   async to(...args: any[]) {
     const point = toPoint(args);
+    let start = this.#from ?? (await mouse.getPosition());
 
     await wrapWithModifiers(async () => {
-      if (this.#from) {
-        await mouse.setPosition(this.#from);
-      }
-
-      await mouse.move(straightTo(point));
+      await this.path([start, point]);
     }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 
@@ -168,8 +156,12 @@ class MouseMoveAction {
     await this.to(point);
   }
 
-  async circle(radius: number, options: CircularOptions = {}) {
+  async circular(radius: number, options: CircularOptions = {}) {
     const center = this.#from ?? (await mouse.getPosition());
+
+    if (options.segments && options.segments === 0) {
+      return;
+    }
 
     await this.path(
       polygon({
@@ -178,23 +170,22 @@ class MouseMoveAction {
         angle: options.angle,
         startAngle: options.startAngle,
         segments: options.segments,
-      }),
-      true
+      })
     );
 
-    await mouse.setPosition(center);
+    // await mouse.setPosition(center);
   }
 
-  async path(
-    checkpoints: Point[] | Generator<Point>,
-    jumpToFirst: boolean = true
-  ) {
-    let i = 0;
-    let start = await mouse.getPosition();
+  async path(checkpoints: Point[] | Generator<Point>) {
+    let checkpointIndex = 0;
+
+    let start: Point = { x: 0, y: 0 };
 
     for (const checkpoint of checkpoints) {
-      if (i === 0 && jumpToFirst) {
+      if (checkpointIndex === 0) {
         await mouse.setPosition(checkpoint);
+        await pressModifiers([this.#alt, this.#ctrl, this.#meta, this.#shift]);
+        await mouse.pressButton(0);
       } else {
         const points = line({ start, end: checkpoint });
 
@@ -207,13 +198,16 @@ class MouseMoveAction {
         }
       }
 
-      if (this.#onStep) {
-        await this.#onStep(checkpoint, i);
+      if (this.#onCheckpoint) {
+        await this.#onCheckpoint(checkpoint, checkpointIndex);
       }
 
-      i++;
       start = checkpoint;
+      checkpointIndex++;
     }
+
+    await mouse.releaseButton(0);
+    await releaseModifiers([this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 }
 

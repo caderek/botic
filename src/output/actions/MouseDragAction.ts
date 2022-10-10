@@ -8,7 +8,7 @@ import {
   Button,
 } from "@nut-tree/nut-js";
 import toPoint from "../helpers/toPoint.js";
-import wrapWithModifiers from "../helpers/wrapWithModifiers.js";
+import { wrapWithModifiers } from "../helpers/modifiers.js";
 import toCenterPoint from "../helpers/toCenterPoint.js";
 import toRandomPoint from "../helpers/toRandomPoint.js";
 

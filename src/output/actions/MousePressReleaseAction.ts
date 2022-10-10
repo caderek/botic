@@ -3,7 +3,7 @@ import { getType, types } from "@arrows/dispatch";
 import toCenterPoint from "../helpers/toCenterPoint.js";
 
 import { Point, Region } from "../../common/types";
-import wrapWithModifiers from "../helpers/wrapWithModifiers.js";
+import { wrapWithModifiers } from "../helpers/modifiers.js";
 
 type Variant = "pressButton" | "releaseButton";
 

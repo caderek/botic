@@ -84,7 +84,7 @@ $.listen.key.press.any.do(async (e) => {
 
 $.loop.interval(10000).do(async () => {
   if (state.wrinklers) {
-    await $.mouse.move.veryFast.circle(200, {
+    await $.mouse.move.veryFast.circular(200, {
       async onStep(point) {
         await $.mouse.click.Left.at(point);
       },

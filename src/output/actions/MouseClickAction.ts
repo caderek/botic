@@ -1,6 +1,6 @@
 import { mouse, Button } from "@nut-tree/nut-js";
 import { getType, types } from "@arrows/dispatch";
-import wrapWithModifiers from "../helpers/wrapWithModifiers.js";
+import { wrapWithModifiers } from "../helpers/modifiers.js";
 import toCenterPoint from "../helpers/toCenterPoint.js";
 
 import { Point, Region } from "../../common/types";
