@@ -7,18 +7,26 @@ type Config = {
   angle?: number;
   startAngle?: number;
   segments?: number;
+  clockwise?: boolean;
 };
 
 const defaults = {
   angle: 360,
   startAngle: 0,
   segments: Infinity,
+  clockwise: true,
 };
 
-function pointOnCircle(radius: number, angle: number, cx: number, cy: number) {
-  angle = angle * (Math.PI / 180);
-  const x = cx + radius * Math.sin(angle);
-  const y = cy + radius * Math.cos(angle);
+function pointOnCircle(
+  radius: number,
+  angle: number,
+  cx: number,
+  cy: number,
+  clockwise: boolean
+) {
+  const angleRadians = ((clockwise ? -angle : angle) + 180) * (Math.PI / 180);
+  const x = cx + radius * Math.sin(angleRadians);
+  const y = cy + radius * Math.cos(angleRadians);
   return { x, y };
 }
 
@@ -40,7 +48,8 @@ function* circular(options: Config) {
       config.radius,
       config.startAngle + angleIncrease * i,
       center.x,
-      center.y
+      center.y,
+      config.clockwise
     );
   }
 }

@@ -17,6 +17,7 @@ type CircularOptions = {
   angle?: number;
   startAngle?: number;
   segments?: number;
+  clockwise?: boolean;
 };
 
 class MouseDragAction {
@@ -171,6 +172,7 @@ class MouseDragAction {
         angle: options.angle,
         startAngle: options.startAngle,
         segments: options.segments,
+        clockwise: options.clockwise,
       })
     );
   }

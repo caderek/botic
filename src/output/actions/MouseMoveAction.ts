@@ -17,6 +17,7 @@ type CircularOptions = {
   angle?: number;
   startAngle?: number;
   segments?: number;
+  clockwise?: boolean;
 };
 
 class MouseMoveAction {
@@ -168,6 +169,7 @@ class MouseMoveAction {
         angle: options.angle,
         startAngle: options.startAngle,
         segments: options.segments,
+        clockwise: options.clockwise,
       })
     );
   }
