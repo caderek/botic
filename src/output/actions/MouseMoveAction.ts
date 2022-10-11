@@ -1,15 +1,11 @@
-import { mouse, left, right, up, down, straightTo } from "@nut-tree/nut-js";
+import { mouse } from "@nut-tree/nut-js";
 import toPoint from "../helpers/toPoint.js";
-import {
-  wrapWithModifiers,
-  pressModifiers,
-  releaseModifiers,
-} from "../helpers/modifiers.js";
+import { pressModifiers, releaseModifiers } from "../helpers/modifiers.js";
 import toCenterPoint from "../helpers/toCenterPoint.js";
 import toRandomPoint from "../helpers/toRandomPoint.js";
 
 import { Point, Region } from "../../common/types";
-import polygon from "../path-generators/polygon.js";
+import circular from "../path-generators/circular.js";
 import line from "../path-generators/line.js";
 import delay from "../../utils/delay.js";
 
@@ -79,6 +75,10 @@ class MouseMoveAction {
     return this;
   }
 
+  async #getStartPoint() {
+    return this.#from ?? (await mouse.getPosition());
+  }
+
   async onCheckpoint(handler: OnCheckpointHandler) {
     this.#onCheckpoint = handler;
   }
@@ -93,53 +93,51 @@ class MouseMoveAction {
   async to(point: Point): Promise<void>;
   async to(x: number, y: number): Promise<void>;
   async to(...args: any[]) {
-    const point = toPoint(args);
-    let start = this.#from ?? (await mouse.getPosition());
-
-    await wrapWithModifiers(async () => {
-      await this.path([start, point]);
-    }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
+    const start = await this.#getStartPoint();
+    const end = toPoint(args);
+    await this.path([start, end]);
   }
 
-  async relative(pixelsX: number, pixelsY: number) {
-    const currentPos = await mouse.getPosition();
-    await this.to({ x: currentPos.x + pixelsX, y: currentPos.y + pixelsY });
+  async diagonal(pixelsX: number, pixelsY: number) {
+    const start = await this.#getStartPoint();
+    const end = { x: start.x + pixelsX, y: start.y + pixelsY };
+    await this.path([start, end]);
   }
 
   async horizontal(pixelsX: number) {
-    await wrapWithModifiers(async () => {
-      await mouse.move(right(pixelsX));
-    }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
+    const start = await this.#getStartPoint();
+    const end = { x: start.x + pixelsX, y: start.y };
+    await this.path([start, end]);
   }
 
   async vertical(pixelsY: number) {
-    await wrapWithModifiers(async () => {
-      await mouse.move(down(pixelsY));
-    }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
+    const start = await this.#getStartPoint();
+    const end = { x: start.x, y: start.y + pixelsY };
+    await this.path([start, end]);
   }
 
   async left(pixels: number) {
-    await wrapWithModifiers(async () => {
-      await mouse.move(left(Math.abs(pixels)));
-    }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
+    const start = await this.#getStartPoint();
+    const end = { x: start.x - Math.abs(pixels), y: start.y };
+    await this.path([start, end]);
   }
 
   async right(pixels: number) {
-    await wrapWithModifiers(async () => {
-      await mouse.move(right(Math.abs(pixels)));
-    }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
+    const start = await this.#getStartPoint();
+    const end = { x: start.x + Math.abs(pixels), y: start.y };
+    await this.path([start, end]);
   }
 
   async up(pixels: number) {
-    await wrapWithModifiers(async () => {
-      await mouse.move(up(Math.abs(pixels)));
-    }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
+    const start = await this.#getStartPoint();
+    const end = { x: start.x, y: start.y - Math.abs(pixels) };
+    await this.path([start, end]);
   }
 
   async down(pixels: number) {
-    await wrapWithModifiers(async () => {
-      await mouse.move(down(Math.abs(pixels)));
-    }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
+    const start = await this.#getStartPoint();
+    const end = { x: start.x, y: start.y + Math.abs(pixels) };
+    await this.path([start, end]);
   }
 
   async center(region?: Region): Promise<void>;
@@ -164,7 +162,7 @@ class MouseMoveAction {
     }
 
     await this.path(
-      polygon({
+      circular({
         center,
         radius,
         angle: options.angle,
@@ -172,11 +170,11 @@ class MouseMoveAction {
         segments: options.segments,
       })
     );
-
-    // await mouse.setPosition(center);
   }
 
   async path(checkpoints: Point[] | Generator<Point>) {
+    mouse.config.autoDelayMs = 0;
+
     let checkpointIndex = 0;
 
     let start: Point = { x: 0, y: 0 };
@@ -185,7 +183,6 @@ class MouseMoveAction {
       if (checkpointIndex === 0) {
         await mouse.setPosition(checkpoint);
         await pressModifiers([this.#alt, this.#ctrl, this.#meta, this.#shift]);
-        await mouse.pressButton(0);
       } else {
         const points = line({ start, end: checkpoint });
 
@@ -206,7 +203,6 @@ class MouseMoveAction {
       checkpointIndex++;
     }
 
-    await mouse.releaseButton(0);
     await releaseModifiers([this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 }

@@ -1,18 +1,23 @@
-import {
-  mouse,
-  left,
-  right,
-  up,
-  down,
-  straightTo,
-  Button,
-} from "@nut-tree/nut-js";
+import { mouse, Button } from "@nut-tree/nut-js";
 import toPoint from "../helpers/toPoint.js";
-import { wrapWithModifiers } from "../helpers/modifiers.js";
+import { pressModifiers, releaseModifiers } from "../helpers/modifiers.js";
 import toCenterPoint from "../helpers/toCenterPoint.js";
 import toRandomPoint from "../helpers/toRandomPoint.js";
 
 import { Point, Region } from "../../common/types";
+import circular from "../path-generators/circular.js";
+import line from "../path-generators/line.js";
+import delay from "../../utils/delay.js";
+
+type OnCheckpointHandler =
+  | ((point: Point, index: number) => Promise<void> | void)
+  | null;
+
+type CircularOptions = {
+  angle?: number;
+  startAngle?: number;
+  segments?: number;
+};
 
 class MouseDragAction {
   #button: Button;
@@ -20,9 +25,9 @@ class MouseDragAction {
   #ctrl: boolean = false;
   #meta: boolean = false;
   #shift: boolean = false;
-  #speed: number = 2000;
-  #delay: number = 0;
+  #delay: number = 2;
   #from?: Point;
+  #onCheckpoint: OnCheckpointHandler = null;
 
   constructor(button: Button) {
     this.#button = button;
@@ -33,28 +38,23 @@ class MouseDragAction {
     return this;
   }
 
-  speed(value: number) {
-    this.#speed = value;
-    return this;
-  }
-
   get fast() {
-    this.#speed = 4000;
+    this.#delay = 1;
     return this;
   }
 
   get veryFast() {
-    this.#speed = 16000;
+    this.#delay = 0;
     return this;
   }
 
   get slow() {
-    this.#speed = 1000;
+    this.#delay = 4;
     return this;
   }
 
   get verySlow() {
-    this.#speed = 250;
+    this.#delay = 8;
     return this;
   }
 
@@ -78,6 +78,14 @@ class MouseDragAction {
     return this;
   }
 
+  async #getStartPoint() {
+    return this.#from ?? (await mouse.getPosition());
+  }
+
+  async onCheckpoint(handler: OnCheckpointHandler) {
+    this.#onCheckpoint = handler;
+  }
+
   from(point: Point): MouseDragAction;
   from(x: number, y: number): MouseDragAction;
   from(...args: any[]) {
@@ -88,72 +96,51 @@ class MouseDragAction {
   async to(point: Point): Promise<void>;
   async to(x: number, y: number): Promise<void>;
   async to(...args: any[]) {
-    const point = toPoint(args);
-    mouse.config.mouseSpeed = this.#speed;
-    mouse.config.autoDelayMs = this.#delay;
-
-    await wrapWithModifiers(async () => {
-      if (this.#from) {
-        await mouse.setPosition(this.#from);
-      }
-
-      await mouse.pressButton(this.#button);
-      await mouse.move(straightTo(point));
-      await mouse.releaseButton(this.#button);
-    }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
+    const start = await this.#getStartPoint();
+    const end = toPoint(args);
+    await this.path([start, end]);
   }
 
-  async relative(pixelsX: number, pixelsY: number) {
-    const currentPos = await mouse.getPosition();
-    await this.to({ x: currentPos.x + pixelsX, y: currentPos.y + pixelsY });
+  async diagonal(pixelsX: number, pixelsY: number) {
+    const start = await this.#getStartPoint();
+    const end = { x: start.x + pixelsX, y: start.y + pixelsY };
+    await this.path([start, end]);
   }
 
   async horizontal(pixelsX: number) {
-    await wrapWithModifiers(async () => {
-      await mouse.pressButton(this.#button);
-      await mouse.move(right(pixelsX));
-      await mouse.releaseButton(this.#button);
-    }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
+    const start = await this.#getStartPoint();
+    const end = { x: start.x + pixelsX, y: start.y };
+    await this.path([start, end]);
   }
 
   async vertical(pixelsY: number) {
-    await wrapWithModifiers(async () => {
-      await mouse.pressButton(this.#button);
-      await mouse.move(down(pixelsY));
-      await mouse.releaseButton(this.#button);
-    }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
+    const start = await this.#getStartPoint();
+    const end = { x: start.x, y: start.y + pixelsY };
+    await this.path([start, end]);
   }
 
   async left(pixels: number) {
-    await wrapWithModifiers(async () => {
-      await mouse.pressButton(this.#button);
-      await mouse.move(left(Math.abs(pixels)));
-      await mouse.releaseButton(this.#button);
-    }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
+    const start = await this.#getStartPoint();
+    const end = { x: start.x - Math.abs(pixels), y: start.y };
+    await this.path([start, end]);
   }
 
   async right(pixels: number) {
-    await wrapWithModifiers(async () => {
-      await mouse.pressButton(this.#button);
-      await mouse.move(right(Math.abs(pixels)));
-      await mouse.releaseButton(this.#button);
-    }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
+    const start = await this.#getStartPoint();
+    const end = { x: start.x + Math.abs(pixels), y: start.y };
+    await this.path([start, end]);
   }
 
   async up(pixels: number) {
-    await wrapWithModifiers(async () => {
-      await mouse.pressButton(this.#button);
-      await mouse.move(up(Math.abs(pixels)));
-      await mouse.releaseButton(this.#button);
-    }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
+    const start = await this.#getStartPoint();
+    const end = { x: start.x, y: start.y - Math.abs(pixels) };
+    await this.path([start, end]);
   }
 
   async down(pixels: number) {
-    await wrapWithModifiers(async () => {
-      await mouse.pressButton(this.#button);
-      await mouse.move(down(Math.abs(pixels)));
-      await mouse.releaseButton(this.#button);
-    }, [this.#alt, this.#ctrl, this.#meta, this.#shift]);
+    const start = await this.#getStartPoint();
+    const end = { x: start.x, y: start.y + Math.abs(pixels) };
+    await this.path([start, end]);
   }
 
   async center(region?: Region): Promise<void>;
@@ -168,6 +155,60 @@ class MouseDragAction {
   async random(arg?: any) {
     const point = await toRandomPoint(arg);
     await this.to(point);
+  }
+
+  async circular(radius: number, options: CircularOptions = {}) {
+    const center = this.#from ?? (await mouse.getPosition());
+
+    if (options.segments && options.segments === 0) {
+      return;
+    }
+
+    await this.path(
+      circular({
+        center,
+        radius,
+        angle: options.angle,
+        startAngle: options.startAngle,
+        segments: options.segments,
+      })
+    );
+  }
+
+  async path(checkpoints: Point[] | Generator<Point>) {
+    mouse.config.autoDelayMs = 0;
+
+    let checkpointIndex = 0;
+
+    let start: Point = { x: 0, y: 0 };
+
+    for (const checkpoint of checkpoints) {
+      if (checkpointIndex === 0) {
+        await mouse.setPosition(checkpoint);
+        await pressModifiers([this.#alt, this.#ctrl, this.#meta, this.#shift]);
+        await mouse.pressButton(this.#button);
+      } else {
+        const points = line({ start, end: checkpoint });
+
+        for (const point of points) {
+          await mouse.setPosition(point);
+
+          if (this.#delay > 0) {
+            await delay(this.#delay);
+          }
+        }
+      }
+
+      if (this.#onCheckpoint) {
+        await this.#onCheckpoint(checkpoint, checkpointIndex);
+      }
+
+      start = checkpoint;
+      checkpointIndex++;
+    }
+
+    await mouse.releaseButton(this.#button);
+    await releaseModifiers([this.#alt, this.#ctrl, this.#meta, this.#shift]);
   }
 }
 

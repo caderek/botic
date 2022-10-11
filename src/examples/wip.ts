@@ -1,13 +1,25 @@
 import logUpdate from "log-update";
 import $ from "../index.js";
 
-let radius = 100;
-
-$.listen.mouse.scroll.vertical.do((e) => {
-  radius += e.rotation === "Up" ? 10 : -10;
-  logUpdate(`Radius: ${radius}`);
-});
-
-$.listen.key.press.Backquote.do(async () => {
-  await $.mouse.move.circular(radius, { startAngle: 45 + 90 * 2 });
+$.listen.key.press.NumpadMultiply.do(async () => {
+  await $.mouse.drag.Left.veryFast
+    .from(400, 350)
+    .circular(100, { segments: 4 });
+  await $.mouse.drag.Left.veryFast
+    .from(630, 350)
+    .circular(100, { segments: 6 });
+  await $.mouse.drag.Left.veryFast
+    .from(860, 350)
+    .circular(100, { segments: 8 });
+  await $.mouse.drag.Left.veryFast
+    .from(1090, 350)
+    .circular(100, { segments: 5 });
+  await $.mouse.drag.Left.veryFast
+    .from(1320, 350)
+    .circular(100, { segments: 3 });
+  await $.mouse.drag.Left.veryFast.from(600, 700).circular(100);
+  await $.mouse.drag.Left.veryFast.from(830, 700).circular(100);
+  await $.mouse.drag.Left.veryFast.from(1060, 700).circular(100);
+  await $.mouse.drag.Left.veryFast.from(715, 800).circular(100);
+  await $.mouse.drag.Left.veryFast.from(945, 800).circular(100);
 });

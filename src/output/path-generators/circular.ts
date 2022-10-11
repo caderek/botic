@@ -23,7 +23,7 @@ function pointOnCircle(radius: number, angle: number, cx: number, cy: number) {
 }
 
 // @todo start from top not bottom, handle angle > 360 degrees (loop or error)
-function* polygon(options: Config) {
+function* circular(options: Config) {
   const config = { ...defaults, ...(ignoreUndefinedProps(options) as Config) };
 
   const segments =
@@ -45,4 +45,4 @@ function* polygon(options: Config) {
   }
 }
 
-export default polygon;
+export default circular;
