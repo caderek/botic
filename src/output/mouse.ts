@@ -4,7 +4,7 @@ import MousePressReleaseAction from "./actions/MousePressReleaseAction.js";
 import MouseScrollAction from "./actions/MouseScrollAction.js";
 import MouseMoveAction from "./actions/MouseMoveAction.js";
 import MouseDragAction from "./actions/MouseDragAction.js";
-import goto from "./actions/goto.js";
+import MouseJumpAction from "./actions/MouseJumpAction.js";
 
 import { Point } from "../common/types";
 
@@ -79,29 +79,26 @@ const mouse = {
   },
 
   /** Sets the mouse position. */
-  goto,
+  get jump() {
+    return new MouseJumpAction();
+  },
 
   /** Moves the mouse. */
   get move() {
     return new MouseMoveAction();
   },
 
-  // /** Drags the mouse holding the left button. */
-  // get drag() {
-  //   return new MouseMoveDragAction("drag");
-  // },
-
-  /** Uses mouse click. */
+  /** Drags the mouse holding the specified button. */
   drag: {
-    /** Uses left mouse button. */
+    /** Holds left mouse button. */
     get Left() {
       return new MouseDragAction(Button.LEFT);
     },
-    /** Uses right mouse button. */
+    /** Holds right mouse button. */
     get Right() {
       return new MouseDragAction(Button.RIGHT);
     },
-    /** Uses middle mouse button. */
+    /** Holds middle mouse button. */
     get Middle() {
       return new MouseDragAction(Button.MIDDLE);
     },

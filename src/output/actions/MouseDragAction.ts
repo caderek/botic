@@ -158,7 +158,7 @@ class MouseDragAction {
     await this.to(point);
   }
 
-  async circular(radius: number, options: CircularOptions = {}) {
+  async angular(radius: number, options: CircularOptions = {}) {
     const center = this.#from ?? (await mouse.getPosition());
 
     if (options.segments && options.segments === 0) {
