@@ -1,3 +1,4 @@
+import { keyboard } from "@nut-tree/nut-js";
 import logUpdate from "log-update";
 import $ from "../index.js";
 
@@ -20,4 +21,8 @@ $.listen.key.press.NumpadMultiply.do(async () => {
       clockwise: false,
     });
   });
+});
+
+$.listen.key.press.Backquote.do(async () => {
+  await $.keyboard.type.natural.send(`Chuj ci w dupę!`);
 });

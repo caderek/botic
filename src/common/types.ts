@@ -6,6 +6,7 @@ import {
   MouseButton,
   VerticalScroll,
   HorizontalScroll,
+  ScrollDirection,
   Keys,
   KeysInput,
 } from "./constants.js";
@@ -29,7 +30,7 @@ export type GlobalScrollEvent = {
   ctrl: boolean;
   meta: boolean;
   shift: boolean;
-  direction: keyof typeof WheelDirection;
+  direction: keyof typeof ScrollDirection;
   rotation: keyof typeof VerticalScroll | keyof typeof HorizontalScroll;
   x: number;
   y: number;

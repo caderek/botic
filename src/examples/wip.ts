@@ -1,16 +1,15 @@
-import logUpdate from "log-update";
+import { mouse } from "@nut-tree/nut-js";
 import $ from "../index.js";
 
-const win = await $.screen.getActive();
+let play = true;
 
-console.log(win);
+$.listen.key.press.Space.do(() => {
+  play = !play;
+});
 
-$.listen.key.press.NumpadMultiply.do(async () => {});
-
-await $.within(win).mouse.goto({ x: 0, y: 0 });
-
-const appWindow = $.within(win);
-
-await appWindow.listen.key.press.Backquote.do(async (e) => {
-  console.log(e);
+$.loop.do(async () => {
+  if (play) {
+    await $.mouse.move.left(10);
+    await $.mouse.move.right(10);
+  }
 });

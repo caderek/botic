@@ -60,7 +60,7 @@ class MouseClickHook implements Hook {
 
   do(handler: (e: GlobalMouseEvent) => void) {
     const predicate = (e: GlobalMouseEvent) =>
-      (this.#button === MouseButton.ANY || e.button === this.#button) &&
+      (this.#button === MouseButton.Any || e.button === this.#button) &&
       (this.#clicks === 1 || e.clicks === this.#clicks) &&
       (this.#all ||
         (e.alt === this.#alt &&

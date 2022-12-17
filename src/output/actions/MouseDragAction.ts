@@ -85,6 +85,7 @@ class MouseDragAction {
 
   async onCheckpoint(handler: OnCheckpointHandler) {
     this.#onCheckpoint = handler;
+    return this;
   }
 
   from(point: Point): MouseDragAction;

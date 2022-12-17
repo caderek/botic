@@ -12,13 +12,18 @@ export enum MouseButton {
 }
 
 export enum VerticalScroll {
-  Up = -1,
-  Down = 1,
+  up = -1,
+  down = 1,
 }
 
 export enum HorizontalScroll {
-  Left = -1,
-  Right = 1,
+  left = -1,
+  right = 1,
+}
+
+export enum ScrollDirection {
+  vertical = 3,
+  horizontal = 4,
 }
 
 export enum KeyboardEventType {

@@ -15,6 +15,7 @@ import {
   VerticalScroll,
   HorizontalScroll,
   KeyCodesInput,
+  ScrollDirection,
 } from "../../common/constants.js";
 
 import { HookHandle, GlobalInputEvent } from "../../common/types";
@@ -75,7 +76,7 @@ const prepareEvent = (e: UiohookInputEvent): GlobalInputEvent => {
         ctrl: e.ctrlKey,
         meta: e.metaKey,
         shift: e.shiftKey,
-        direction: WheelDirection[e.direction] as keyof typeof WheelDirection,
+        direction: ScrollDirection[e.direction] as keyof typeof ScrollDirection,
         rotation:
           e.direction === WheelDirection.VERTICAL
             ? (VerticalScroll[e.rotation] as keyof typeof VerticalScroll)

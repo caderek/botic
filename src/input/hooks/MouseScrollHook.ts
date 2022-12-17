@@ -9,8 +9,8 @@ class MouseScrollHook implements Hook {
   #ctrl: boolean = false;
   #meta: boolean = false;
   #shift: boolean = false;
-  #rotation: "LEFT" | "RIGHT" | "UP" | "DOWN" | "ANY" = "ANY";
-  #direction: "HORIZONTAL" | "VERTICAL" | "ANY" = "ANY";
+  #rotation: "left" | "right" | "up" | "down" | "any" = "any";
+  #direction: "horizontal" | "vertical" | "any" = "any";
 
   constructor() {
     this.#id = Symbol();
@@ -27,32 +27,32 @@ class MouseScrollHook implements Hook {
   }
 
   get up() {
-    this.#rotation = "UP";
+    this.#rotation = "up";
     return this;
   }
 
   get down() {
-    this.#rotation = "DOWN";
+    this.#rotation = "down";
     return this;
   }
 
   get left() {
-    this.#rotation = "LEFT";
+    this.#rotation = "left";
     return this;
   }
 
   get right() {
-    this.#rotation = "RIGHT";
+    this.#rotation = "right";
     return this;
   }
 
   get vertical() {
-    this.#direction = "VERTICAL";
+    this.#direction = "vertical";
     return this;
   }
 
   get horizontal() {
-    this.#direction = "HORIZONTAL";
+    this.#direction = "horizontal";
     return this;
   }
 
@@ -78,8 +78,8 @@ class MouseScrollHook implements Hook {
 
   do(handler: (e: GlobalScrollEvent) => void) {
     const predicate = (e: GlobalScrollEvent) =>
-      (this.#rotation === "ANY" || e.rotation === this.#rotation) &&
-      (this.#direction === "ANY" || e.direction === this.#direction) &&
+      (this.#rotation === "any" || e.rotation === this.#rotation) &&
+      (this.#direction === "any" || e.direction === this.#direction) &&
       (this.#all ||
         (e.alt === this.#alt &&
           e.ctrl === this.#ctrl &&

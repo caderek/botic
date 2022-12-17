@@ -15,19 +15,19 @@ const listen = {
     click: {
       /** Registers any mouse button. */
       get Any() {
-        return new MouseClickHook(MouseButton.ANY);
+        return new MouseClickHook(MouseButton.Any);
       },
       /** Registers left mouse button. */
       get Left() {
-        return new MouseClickHook(MouseButton.LEFT);
+        return new MouseClickHook(MouseButton.Left);
       },
       /** Registers right mouse button. */
       get Right() {
-        return new MouseClickHook(MouseButton.RIGHT);
+        return new MouseClickHook(MouseButton.Right);
       },
       /** Registers middle mouse button. */
       get Middle() {
-        return new MouseClickHook(MouseButton.MIDDLE);
+        return new MouseClickHook(MouseButton.Middle);
       },
     },
 
@@ -35,19 +35,19 @@ const listen = {
     press: {
       /** Registers any mouse button. */
       get Any() {
-        return new MousePressReleaseHook("mousedown", MouseButton.ANY);
+        return new MousePressReleaseHook("mousedown", MouseButton.Any);
       },
       /** Registers left mouse button. */
       get Left() {
-        return new MousePressReleaseHook("mousedown", MouseButton.LEFT);
+        return new MousePressReleaseHook("mousedown", MouseButton.Left);
       },
       /** Registers right mouse button. */
       get Right() {
-        return new MousePressReleaseHook("mousedown", MouseButton.RIGHT);
+        return new MousePressReleaseHook("mousedown", MouseButton.Right);
       },
       /** Registers middle mouse button. */
       get Middle() {
-        return new MousePressReleaseHook("mousedown", MouseButton.MIDDLE);
+        return new MousePressReleaseHook("mousedown", MouseButton.Middle);
       },
     },
 
@@ -55,19 +55,19 @@ const listen = {
     release: {
       /** Registers any mouse button. */
       get Any() {
-        return new MousePressReleaseHook("mouseup", MouseButton.ANY);
+        return new MousePressReleaseHook("mouseup", MouseButton.Any);
       },
       /** Registers left mouse button. */
       get Left() {
-        return new MousePressReleaseHook("mouseup", MouseButton.LEFT);
+        return new MousePressReleaseHook("mouseup", MouseButton.Left);
       },
       /** Registers right mouse button. */
       get Right() {
-        return new MousePressReleaseHook("mouseup", MouseButton.RIGHT);
+        return new MousePressReleaseHook("mouseup", MouseButton.Right);
       },
       /** Registers middle mouse button. */
       get Middle() {
-        return new MousePressReleaseHook("mouseup", MouseButton.MIDDLE);
+        return new MousePressReleaseHook("mouseup", MouseButton.Middle);
       },
     },
 
